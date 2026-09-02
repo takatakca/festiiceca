@@ -18,7 +18,7 @@ import {
   venue,
 } from "@/lib/festi-data";
 
-type Search = { date?: string; theme?: string };
+type Search = { date?: string | undefined; theme?: string | undefined };
 
 export const Route = createFileRoute("/billets")({
   validateSearch: (search: Record<string, unknown>): Search => ({
@@ -605,11 +605,11 @@ function Success({
   total,
   program,
 }: {
-  date?: Date;
-  slot?: string;
+  date?: Date | undefined;
+  slot?: string | undefined;
   tickets: number;
   total: number;
-  program?: string;
+  program?: string | undefined;
 }) {
   return (
     <main className="mx-auto max-w-2xl px-4 pb-32 pt-32 text-center sm:px-6">
