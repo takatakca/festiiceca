@@ -14,18 +14,20 @@ import havanaImg from "@/assets/havana-winter.jpg";
 import tunnelImg from "@/assets/ambiance-tunnel.jpg";
 import familleImg from "@/assets/ambiance-famille.jpg";
 import {
-  accommodations,
-  faq,
   formatCents,
   practicalInfo,
-  programs,
-  routeSegments,
-  season,
   ticketTypes,
   venue,
 } from "@/lib/festi-data";
+import { getSiteContent } from "@/lib/content.functions";
+import {
+  resolveContent,
+  SiteContentProvider,
+  useSiteContent,
+} from "@/lib/site-content";
 
 export const Route = createFileRoute("/")({
+  loader: () => getSiteContent(),
   head: () => ({
     meta: [
       { title: "FESTI-ICE — Patinez dans la lumière | Maricourt, Québec" },
@@ -44,27 +46,44 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  errorComponent: () => (
+    <main className="mx-auto max-w-2xl px-4 py-32">
+      <h1 className="text-3xl">Contenu momentanément indisponible</h1>
+      <p className="mt-4 text-muted-foreground">
+        Rechargez la page dans quelques instants.
+      </p>
+    </main>
+  ),
+  notFoundComponent: () => (
+    <main className="mx-auto max-w-2xl px-4 py-32">
+      <h1 className="text-3xl">Page introuvable</h1>
+    </main>
+  ),
   component: Home,
 });
 
 function Home() {
+  const content = resolveContent(Route.useLoaderData());
   return (
-    <main>
-      <Hero />
-      <WhatIs />
-      <OneWorld />
-      <Journey />
-      <Programming />
-      <Highlights />
-      <Havana />
-      <Stay />
-      <Practical />
-      <Tickets />
-      <Location />
-      <Faq />
-    </main>
+    <SiteContentProvider value={content}>
+      <main>
+        <Hero />
+        <WhatIs />
+        <OneWorld />
+        <Journey />
+        <Programming />
+        <Highlights />
+        <Havana />
+        <Stay />
+        <Practical />
+        <Tickets />
+        <Location />
+        <Faq />
+      </main>
+    </SiteContentProvider>
   );
 }
+
 
 /* 01 — HERO */
 function Hero() {
