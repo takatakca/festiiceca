@@ -87,6 +87,7 @@ function Home() {
 
 /* 01 — HERO */
 function Hero() {
+  const { season } = useSiteContent();
   return (
     <section className="relative flex min-h-[92svh] items-end overflow-hidden">
       <img
@@ -196,6 +197,7 @@ function WhatIs() {
 
 /* 03 — ONE WORLD, ALWAYS CHANGING (scroll-driven ambiance) */
 function OneWorld() {
+  const { routeSegments } = useSiteContent();
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
@@ -357,8 +359,11 @@ function Journey() {
 
 /* 05 — PROGRAMMING */
 function Programming() {
-  const [selected, setSelected] = useState(programs[2]!.dayIndex);
-  const p = programs.find((x) => x.dayIndex === selected)!;
+  const { programs } = useSiteContent();
+  const [selected, setSelected] = useState(
+    (programs[2] ?? programs[0])!.dayIndex,
+  );
+  const p = programs.find((x) => x.dayIndex === selected) ?? programs[0]!;
 
   return (
     <section
@@ -543,6 +548,7 @@ function Havana() {
 
 /* 08 — STAY THE NIGHT */
 function Stay() {
+  const { accommodations } = useSiteContent();
   return (
     <section className="px-4 py-24 sm:px-6 lg:py-32">
       <div className="mx-auto max-w-7xl">
@@ -688,6 +694,7 @@ function Location() {
 
 /* 12 — FAQ */
 function Faq() {
+  const { faq } = useSiteContent();
   return (
     <section className="border-t border-border/60 bg-card/30 px-4 py-24 sm:px-6 lg:py-32">
       <div className="mx-auto max-w-4xl">
