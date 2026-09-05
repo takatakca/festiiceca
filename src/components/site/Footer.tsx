@@ -1,15 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { season, support, venue } from "@/lib/festi-data";
+import { FestiIceLogo } from "@/components/site/FestiIceLogo";
 
 export function Footer() {
   return (
     <footer className="border-t border-border/60 bg-[color-mix(in_oklab,var(--background)_92%,black)]">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
         <div>
-          <p className="font-display text-2xl">
-            FESTI<span className="text-ice">-ICE</span>
-          </p>
-          <p className="mt-3 max-w-xs text-sm text-muted-foreground">
+          <FestiIceLogo variant="footer" />
+          <p className="mt-5 max-w-xs text-sm text-muted-foreground">
             Un parcours sur glace illuminé au cœur du Havana Resort, à Maricourt.
           </p>
           {season.isInauguralSeason && (

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { FestiIceLogo } from "@/components/site/FestiIceLogo";
 
 const NAV = [
   { label: "Expérience", href: "/#experience" },
@@ -30,10 +31,13 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:h-20">
-        <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <span className="font-display text-lg tracking-tight sm:text-xl">
-            FESTI<span className="text-ice">-ICE</span>
-          </span>
+        <Link
+          to="/"
+          className="flex shrink-0 items-center"
+          onClick={() => setOpen(false)}
+          aria-label="FESTI-ICE au Havana Resort — accueil"
+        >
+          <FestiIceLogo variant="header" priority />
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
