@@ -238,6 +238,18 @@ function OneWorld() {
           <span style={{ color: seg.accent }}>Plusieurs ambiances.</span>
         </h2>
 
+        <img
+          src={havanaPhotos.fleurs.url}
+          alt={havanaPhotos.fleurs.altFr}
+          width={havanaPhotos.fleurs.width}
+          height={havanaPhotos.fleurs.height}
+          loading="lazy"
+          decoding="async"
+          style={{ objectPosition: havanaPhotos.fleurs.focal }}
+          className="mt-10 aspect-[16/9] w-full rounded-2xl border border-border/40 object-cover"
+        />
+
+
         <div className="mt-14 grid gap-12 lg:grid-cols-[1fr_1.1fr]">
           {/* luminous route visualization */}
           <div className="lg:sticky lg:top-28 lg:h-fit">
