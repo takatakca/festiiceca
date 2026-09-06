@@ -544,6 +544,31 @@ function Havana() {
         <p className="mt-4 text-xs text-muted-foreground">
           Les temps de déplacement sont approximatifs.
         </p>
+
+        <div className="mt-14 grid items-center gap-8 rounded-2xl border border-border/50 bg-background/40 p-6 sm:grid-cols-2">
+          <img
+            src={havanaPhotos.sign.url}
+            alt={havanaPhotos.sign.altFr}
+            width={havanaPhotos.sign.width}
+            height={havanaPhotos.sign.height}
+            loading="lazy"
+            decoding="async"
+            style={{ objectPosition: havanaPhotos.sign.focal }}
+            className="aspect-[4/3] w-full rounded-xl object-cover"
+          />
+          <address className="not-italic">
+            <p className="eyebrow">Adresse</p>
+            <p className="mt-4 font-display text-2xl">Havana Resort</p>
+            <p className="mt-2 text-sm leading-relaxed text-silver">
+              631, 7e Rang
+              <br />
+              Maricourt, QC
+              <br />
+              J0E 2L2
+            </p>
+          </address>
+        </div>
+
       </div>
     </section>
   );
