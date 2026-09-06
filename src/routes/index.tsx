@@ -10,6 +10,8 @@ import {
   Clock,
 } from "lucide-react";
 import heroImg from "@/assets/hero-festi-ice.jpg";
+import tunnelImg from "@/assets/ambiance-tunnel.jpg";
+import havanaImg from "@/assets/havana-winter.jpg";
 import familleImg from "@/assets/ambiance-famille.jpg";
 import { havanaPhotos } from "@/lib/havana-media";
 import { HavanaGallery } from "@/components/site/HavanaGallery";
