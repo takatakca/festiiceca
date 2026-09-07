@@ -208,7 +208,7 @@ export function HavanaGallery() {
         onClose={() => setLightbox(null)}
         onIndexChange={(i) => {
           setLightbox(i);
-          if (typeof i === "number") setIndex(i);
+          setIndex(i);
         }}
       />
     </section>
