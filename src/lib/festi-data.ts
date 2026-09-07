@@ -59,20 +59,8 @@ export type RouteSegment = {
 
 export const routeSegments: RouteSegment[] = [
   {
-    id: "seg-entree",
-    order: 1,
-    name: "Entrée glacée",
-    street: "Rue de La Havane",
-    descriptionFr:
-      "Le départ. Une arche de lumière froide, la glace qui craque doucement et le premier souffle d'hiver.",
-    musicStyle: "Ambient • Cinématique",
-    lightingStyle: "Cyan glacier",
-    accent: "oklch(0.82 0.14 205)",
-    background: "oklch(0.15 0.05 259)",
-  },
-  {
     id: "seg-latino",
-    order: 2,
+    order: 1,
     name: "Calle Latina",
     street: "Rue Varadero",
     descriptionFr:
@@ -84,7 +72,7 @@ export const routeSegments: RouteSegment[] = [
   },
   {
     id: "seg-neon",
-    order: 3,
+    order: 2,
     name: "Neon Drive",
     street: "Rue Matanzas",
     descriptionFr:
@@ -96,7 +84,7 @@ export const routeSegments: RouteSegment[] = [
   },
   {
     id: "seg-foret",
-    order: 4,
+    order: 3,
     name: "Forêt animée",
     street: "Rue Cienfuegos",
     descriptionFr:
@@ -108,7 +96,7 @@ export const routeSegments: RouteSegment[] = [
   },
   {
     id: "seg-country",
-    order: 5,
+    order: 4,
     name: "Rang doré",
     street: "Rue Cayo Coco",
     descriptionFr:
@@ -120,7 +108,7 @@ export const routeSegments: RouteSegment[] = [
   },
   {
     id: "seg-final",
-    order: 6,
+    order: 5,
     name: "Grand Final",
     street: "Rue Santiago de Cuba",
     descriptionFr:

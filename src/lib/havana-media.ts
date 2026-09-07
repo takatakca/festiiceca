@@ -13,6 +13,14 @@ import playera from "@/assets/havana-la-playera.webp.asset.json";
 import mojito from "@/assets/havana-mojito-bar.webp.asset.json";
 import guirlandes from "@/assets/havana-guirlandes.webp.asset.json";
 import feu from "@/assets/havana-feu-exterieur.webp.asset.json";
+import pieux from "@/assets/havana-guirlandes-pieux.webp.asset.json";
+import photobooth from "@/assets/havana-photobooth.webp.asset.json";
+import foyer from "@/assets/havana-foyer-terrasse.webp.asset.json";
+import pompier from "@/assets/havana-camion-pompier.webp.asset.json";
+import arbreGeant from "@/assets/havana-arbre-geant.webp.asset.json";
+import rueTrain from "@/assets/havana-rue-train.webp.asset.json";
+import rueGuirlandes from "@/assets/havana-rue-guirlandes.webp.asset.json";
+import carte from "@/assets/havana-carte.webp.asset.json";
 
 export type HavanaPhoto = {
   key: string;
