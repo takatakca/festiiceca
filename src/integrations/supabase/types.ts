@@ -139,6 +139,60 @@ export type Database = {
         }
         Relationships: []
       }
+      event_dates: {
+        Row: {
+          created_at: string
+          event_date: string
+          id: string
+          internal_notes: string | null
+          is_test: boolean
+          program_id: string | null
+          published: boolean
+          season_id: string
+          status: Database["public"]["Enums"]["public_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_date: string
+          id?: string
+          internal_notes?: string | null
+          is_test?: boolean
+          program_id?: string | null
+          published?: boolean
+          season_id: string
+          status?: Database["public"]["Enums"]["public_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_date?: string
+          id?: string
+          internal_notes?: string | null
+          is_test?: boolean
+          program_id?: string | null
+          published?: boolean
+          season_id?: string
+          status?: Database["public"]["Enums"]["public_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_dates_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_dates_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       facilities: {
         Row: {
           category: string
@@ -245,6 +299,44 @@ export type Database = {
           },
         ]
       }
+      holds: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          quantity: number
+          status: Database["public"]["Enums"]["hold_status"]
+          time_slot_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          quantity: number
+          status?: Database["public"]["Enums"]["hold_status"]
+          time_slot_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          quantity?: number
+          status?: Database["public"]["Enums"]["hold_status"]
+          time_slot_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holds_time_slot_id_fkey"
+            columns: ["time_slot_id"]
+            isOneToOne: false
+            referencedRelation: "time_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_assets: {
         Row: {
           alt_en: string | null
@@ -340,6 +432,141 @@ export type Database = {
           },
         ]
       }
+      order_items: {
+        Row: {
+          created_at: string
+          flex_selected: boolean
+          id: string
+          name_snapshot: string
+          order_id: string
+          quantity: number
+          ticket_type_code: string
+          unit_price_cents: number
+        }
+        Insert: {
+          created_at?: string
+          flex_selected?: boolean
+          id?: string
+          name_snapshot: string
+          order_id: string
+          quantity: number
+          ticket_type_code: string
+          unit_price_cents: number
+        }
+        Update: {
+          created_at?: string
+          flex_selected?: boolean
+          id?: string
+          name_snapshot?: string
+          order_id?: string
+          quantity?: number
+          ticket_type_code?: string
+          unit_price_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          currency: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          flex_cents: number
+          gst_cents: number
+          hold_id: string | null
+          id: string
+          order_number: string
+          paid_at: string | null
+          qst_cents: number
+          quantity: number
+          season_id: string | null
+          snapshot: Json
+          status: Database["public"]["Enums"]["order_status"]
+          stripe_payment_intent_id: string | null
+          subtotal_cents: number
+          time_slot_id: string | null
+          total_cents: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          flex_cents?: number
+          gst_cents?: number
+          hold_id?: string | null
+          id?: string
+          order_number: string
+          paid_at?: string | null
+          qst_cents?: number
+          quantity?: number
+          season_id?: string | null
+          snapshot?: Json
+          status?: Database["public"]["Enums"]["order_status"]
+          stripe_payment_intent_id?: string | null
+          subtotal_cents?: number
+          time_slot_id?: string | null
+          total_cents?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          flex_cents?: number
+          gst_cents?: number
+          hold_id?: string | null
+          id?: string
+          order_number?: string
+          paid_at?: string | null
+          qst_cents?: number
+          quantity?: number
+          season_id?: string | null
+          snapshot?: Json
+          status?: Database["public"]["Enums"]["order_status"]
+          stripe_payment_intent_id?: string | null
+          subtotal_cents?: number
+          time_slot_id?: string | null
+          total_cents?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_hold_id_fkey"
+            columns: ["hold_id"]
+            isOneToOne: false
+            referencedRelation: "holds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_time_slot_id_fkey"
+            columns: ["time_slot_id"]
+            isOneToOne: false
+            referencedRelation: "time_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       page_content: {
         Row: {
           block_key: string
@@ -383,6 +610,53 @@ export type Database = {
             columns: ["media_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          id: string
+          order_id: string
+          provider: string
+          provider_event_id: string | null
+          provider_intent_id: string | null
+          raw: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          id?: string
+          order_id: string
+          provider?: string
+          provider_event_id?: string | null
+          provider_intent_id?: string | null
+          raw?: Json | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          provider?: string
+          provider_event_id?: string | null
+          provider_intent_id?: string | null
+          raw?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -607,6 +881,178 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      ticket_types: {
+        Row: {
+          active: boolean
+          code: string
+          counts_as_adult: boolean
+          created_at: string
+          description_en: string | null
+          description_fr: string | null
+          id: string
+          is_addon: boolean
+          maximum_adults: number | null
+          maximum_quantity: number
+          minimum_group_size: number | null
+          minimum_quantity: number
+          name_en: string
+          name_fr: string
+          price_cents: number
+          season_id: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          counts_as_adult?: boolean
+          created_at?: string
+          description_en?: string | null
+          description_fr?: string | null
+          id?: string
+          is_addon?: boolean
+          maximum_adults?: number | null
+          maximum_quantity?: number
+          minimum_group_size?: number | null
+          minimum_quantity?: number
+          name_en: string
+          name_fr: string
+          price_cents: number
+          season_id?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          counts_as_adult?: boolean
+          created_at?: string
+          description_en?: string | null
+          description_fr?: string | null
+          id?: string
+          is_addon?: boolean
+          maximum_adults?: number | null
+          maximum_quantity?: number
+          minimum_group_size?: number | null
+          minimum_quantity?: number
+          name_en?: string
+          name_fr?: string
+          price_cents?: number
+          season_id?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_types_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          created_at: string
+          flex_selected: boolean
+          id: string
+          name_snapshot: string
+          order_id: string
+          qr_token: string
+          scanned_at: string | null
+          scanned_by: string | null
+          status: Database["public"]["Enums"]["ticket_status"]
+          ticket_type_code: string
+          time_slot_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          flex_selected?: boolean
+          id?: string
+          name_snapshot: string
+          order_id: string
+          qr_token: string
+          scanned_at?: string | null
+          scanned_by?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          ticket_type_code: string
+          time_slot_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          flex_selected?: boolean
+          id?: string
+          name_snapshot?: string
+          order_id?: string
+          qr_token?: string
+          scanned_at?: string | null
+          scanned_by?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          ticket_type_code?: string
+          time_slot_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_time_slot_id_fkey"
+            columns: ["time_slot_id"]
+            isOneToOne: false
+            referencedRelation: "time_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_slots: {
+        Row: {
+          capacity: number
+          created_at: string
+          event_date_id: string
+          id: string
+          published: boolean
+          start_time: string
+          status: Database["public"]["Enums"]["public_status"]
+          updated_at: string
+        }
+        Insert: {
+          capacity: number
+          created_at?: string
+          event_date_id: string
+          id?: string
+          published?: boolean
+          start_time: string
+          status?: Database["public"]["Enums"]["public_status"]
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          event_date_id?: string
+          id?: string
+          published?: boolean
+          start_time?: string
+          status?: Database["public"]["Enums"]["public_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_slots_event_date_id_fkey"
+            columns: ["event_date_id"]
+            isOneToOne: false
+            referencedRelation: "event_dates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
@@ -836,6 +1282,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_hold: {
+        Args: { _minutes?: number; _quantity: number; _slot_id: string }
+        Returns: {
+          created_at: string
+          expires_at: string
+          id: string
+          quantity: number
+          status: Database["public"]["Enums"]["hold_status"]
+          time_slot_id: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "holds"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]
@@ -851,6 +1315,11 @@ export type Database = {
         Returns: boolean
       }
       is_staff_admin: { Args: { _user_id: string }; Returns: boolean }
+      redeem_ticket: {
+        Args: { _qr_token: string; _scanner: string }
+        Returns: Json
+      }
+      slot_remaining_capacity: { Args: { _slot_id: string }; Returns: number }
     }
     Enums: {
       app_role:
@@ -860,15 +1329,24 @@ export type Database = {
         | "OPERATIONS"
         | "ADMIN"
         | "SUPER_ADMIN"
+      hold_status: "ACTIVE" | "CONVERTED" | "RELEASED" | "EXPIRED"
       ice_condition:
         | "EXCELLENT"
         | "GOOD"
         | "VARIABLE"
         | "MAINTENANCE"
         | "CLOSED"
+      order_status:
+        | "DRAFT"
+        | "PENDING_PAYMENT"
+        | "PAID"
+        | "CANCELLED"
+        | "REFUNDED"
+        | "FAILED"
       public_status: "OPEN" | "ADVISORY" | "PARTIAL" | "CLOSED" | "CANCELLED"
       season_status: "DRAFT" | "ACTIVE" | "ARCHIVED"
       segment_status: "OPEN" | "ADVISORY" | "CLOSED"
+      ticket_status: "VALID" | "USED" | "VOID" | "REFUNDED"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1004,10 +1482,20 @@ export const Constants = {
         "ADMIN",
         "SUPER_ADMIN",
       ],
+      hold_status: ["ACTIVE", "CONVERTED", "RELEASED", "EXPIRED"],
       ice_condition: ["EXCELLENT", "GOOD", "VARIABLE", "MAINTENANCE", "CLOSED"],
+      order_status: [
+        "DRAFT",
+        "PENDING_PAYMENT",
+        "PAID",
+        "CANCELLED",
+        "REFUNDED",
+        "FAILED",
+      ],
       public_status: ["OPEN", "ADVISORY", "PARTIAL", "CLOSED", "CANCELLED"],
       season_status: ["DRAFT", "ACTIVE", "ARCHIVED"],
       segment_status: ["OPEN", "ADVISORY", "CLOSED"],
+      ticket_status: ["VALID", "USED", "VOID", "REFUNDED"],
     },
   },
 } as const
