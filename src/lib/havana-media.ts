@@ -5,12 +5,12 @@
  * of a past FESTI-ICE edition (2026-2027 is the inaugural season). Captions
  * must never claim otherwise.
  */
-import sign from "@/assets/havana-sign.webp.asset.json";
-import fleurs from "@/assets/havana-fleurs-geantes.webp.asset.json";
+import sign from "@/assets/havana-sign.jpeg";
+import fleurs from "@/assets/havana-fleurs-geantes.jpeg";
 import arbre from "@/assets/havana-arbre-lumieres.webp.asset.json";
-import train from "@/assets/havana-train.webp.asset.json";
-import playera from "@/assets/havana-la-playera.webp.asset.json";
-import mojito from "@/assets/havana-mojito-bar.webp.asset.json";
+import train from "@/assets/havana-train.jpeg";
+import playera from "@/assets/havana-la-playera.jpeg";
+import mojito from "@/assets/havana-mojito-bar.jpeg";
 import guirlandes from "@/assets/havana-guirlandes.webp.asset.json";
 import feu from "@/assets/havana-feu-exterieur.webp.asset.json";
 import pieux from "@/assets/havana-guirlandes-pieux.webp.asset.json";
@@ -18,9 +18,9 @@ import photobooth from "@/assets/havana-photobooth.webp.asset.json";
 import foyer from "@/assets/havana-foyer-terrasse.webp.asset.json";
 import pompier from "@/assets/havana-camion-pompier.webp.asset.json";
 import arbreGeant from "@/assets/havana-arbre-geant.webp.asset.json";
-import rueTrain from "@/assets/havana-rue-train.webp.asset.json";
+import rueTrain from "@/assets/havana-rue-train.jpeg";
 import rueGuirlandes from "@/assets/havana-rue-guirlandes.webp.asset.json";
-import carte from "@/assets/havana-carte.webp.asset.json";
+import carte from "@/assets/havana-carte.jpeg";
 
 export type HavanaPhoto = {
   key: string;
@@ -45,7 +45,7 @@ export type HavanaPhoto = {
 export const havanaPhotos = {
   sign: {
     key: "havana-sign",
-    url: sign.url,
+    url: sign,
     width: 1448,
     height: 1086,
     focal: "50% 45%",
@@ -58,7 +58,7 @@ export const havanaPhotos = {
   },
   fleurs: {
     key: "havana-fleurs-geantes",
-    url: fleurs.url,
+    url: fleurs,
     width: 1086,
     height: 1448,
     focal: "50% 40%",
@@ -83,7 +83,7 @@ export const havanaPhotos = {
   },
   train: {
     key: "havana-train",
-    url: train.url,
+    url: train,
     width: 1086,
     height: 1448,
     focal: "35% 50%",
@@ -95,7 +95,7 @@ export const havanaPhotos = {
   },
   playera: {
     key: "havana-la-playera",
-    url: playera.url,
+    url: playera,
     width: 1448,
     height: 1086,
     focal: "65% 45%",
@@ -107,7 +107,7 @@ export const havanaPhotos = {
   },
   mojito: {
     key: "havana-mojito-bar",
-    url: mojito.url,
+    url: mojito,
     width: 1448,
     height: 1086,
     focal: "50% 45%",
@@ -203,7 +203,7 @@ export const havanaPhotos = {
   },
   rueTrain: {
     key: "havana-rue-train",
-    url: rueTrain.url,
+    url: rueTrain,
     width: 895,
     height: 1180,
     focal: "50% 45%",
@@ -246,7 +246,7 @@ export const galleryPhotos: HavanaPhoto[] = [
 
 /** Official Havana Resort property map (supplied by the resort). */
 export const havanaMap = {
-  url: carte.url,
+  url: carte,
   width: 1920,
   height: 1242,
   altFr:

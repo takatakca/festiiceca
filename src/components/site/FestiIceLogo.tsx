@@ -1,5 +1,3 @@
-import logoAsset from "@/assets/festi-ice-logo.png.asset.json";
-
 type Variant = "header" | "footer" | "compact" | "large";
 
 const SIZES: Record<Variant, string> = {
@@ -10,8 +8,8 @@ const SIZES: Record<Variant, string> = {
 };
 
 /**
- * Official FESTI-ICE brand mark (Camping Havana Resort + FESTI-ICE wordmark).
- * Single source of truth — never redraw or recompose the artwork.
+ * Official FESTI-ICE brand mark.
+ * The image is stored locally in the public directory.
  */
 export function FestiIceLogo({
   variant = "header",
@@ -24,7 +22,7 @@ export function FestiIceLogo({
 }) {
   return (
     <img
-      src={logoAsset.url}
+      src="/festi-ice-logo.jpeg"
       alt="FESTI-ICE au Havana Resort"
       loading={priority ? "eager" : "lazy"}
       decoding="async"
