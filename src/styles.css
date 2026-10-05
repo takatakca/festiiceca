@@ -43,12 +43,13 @@
   --color-aurora: var(--aurora);
   --color-coral: var(--coral);
   --color-violet-ice: var(--violet-ice);
+  --color-warm: var(--warm);
   --font-display: "Archivo Black", system-ui, sans-serif;
   --font-sans: "Space Grotesk", system-ui, sans-serif;
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0.5rem;
 
   --midnight: oklch(0.17 0.055 258);
   --glacier: oklch(0.72 0.11 231);
@@ -58,29 +59,30 @@
   --aurora: oklch(0.83 0.13 180);
   --coral: oklch(0.74 0.15 32);
   --violet-ice: oklch(0.66 0.15 285);
+  --warm: oklch(0.86 0.15 83);
 
-  --background: oklch(0.15 0.05 259);
+  --background: oklch(0.145 0.035 248);
   --foreground: oklch(0.97 0.008 220);
-  --card: oklch(0.21 0.05 259);
+  --card: oklch(0.195 0.035 248);
   --card-foreground: oklch(0.97 0.008 220);
   --popover: oklch(0.19 0.05 259);
   --popover-foreground: oklch(0.97 0.008 220);
   --primary: oklch(0.82 0.14 205);
   --primary-foreground: oklch(0.16 0.05 259);
-  --secondary: oklch(0.26 0.05 259);
+  --secondary: oklch(0.25 0.04 248);
   --secondary-foreground: oklch(0.97 0.008 220);
-  --muted: oklch(0.24 0.045 259);
+  --muted: oklch(0.23 0.035 248);
   --muted-foreground: oklch(0.74 0.025 235);
   --accent: oklch(0.72 0.11 231);
   --accent-foreground: oklch(0.16 0.05 259);
   --destructive: oklch(0.62 0.2 25);
   --destructive-foreground: oklch(0.98 0.005 220);
-  --border: oklch(0.35 0.05 250 / 55%);
+  --border: oklch(0.45 0.045 230 / 42%);
   --input: oklch(0.35 0.05 250 / 60%);
   --ring: oklch(0.82 0.14 205);
 
   --gradient-ice: linear-gradient(135deg, var(--cyan-ice), var(--glacier) 55%, var(--violet-ice));
-  --gradient-night: linear-gradient(180deg, oklch(0.15 0.05 259 / 0%), oklch(0.13 0.05 259) 92%);
+  --gradient-night: linear-gradient(180deg, oklch(0.13 0.035 248 / 8%), oklch(0.11 0.035 248 / 42%) 48%, oklch(0.105 0.035 248) 100%);
   --glow-ice: 0 0 0 1px oklch(0.82 0.14 205 / 25%), 0 18px 50px -18px oklch(0.82 0.14 205 / 55%);
   --glow-soft: 0 20px 60px -30px oklch(0.72 0.11 231 / 70%);
 }
@@ -106,8 +108,8 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
-    line-height: 0.95;
+    letter-spacing: 0;
+    line-height: 0.98;
     text-transform: uppercase;
   }
 
@@ -141,10 +143,51 @@
 
 @utility eyebrow {
   font-size: 0.72rem;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--cyan-ice);
   font-weight: 600;
+}
+
+@utility festival-button {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  padding-inline: 2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+  &:hover { transform: translateY(-2px); }
+}
+
+@utility install-prompt {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 60;
+  width: min(22rem, calc(100vw - 2rem));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--card) 94%, transparent);
+  padding: 1rem;
+  box-shadow: 0 24px 80px -32px oklch(0.05 0.03 250);
+  backdrop-filter: blur(18px);
+}
+
+.hero-stage::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  content: "";
+  background: linear-gradient(90deg, var(--cyan-ice), var(--warm), var(--coral));
+}
+
+.festival-village {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--card) 88%, transparent), color-mix(in oklab, var(--background) 96%, var(--warm)));
 }
 
 @keyframes shimmer {

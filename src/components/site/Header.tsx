@@ -30,7 +30,7 @@ export function Header() {
           : "border-b border-transparent"
       }`}
     >
-      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-6 lg:h-20">
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-6 lg:h-20 lg:grid-cols-[auto_minmax(0,1fr)_auto]">
         <Link
           to="/"
           className="flex shrink-0 items-center"
