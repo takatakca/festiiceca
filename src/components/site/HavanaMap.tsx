@@ -18,7 +18,7 @@ const pois: Poi[] = [
   { id: "parcours", label: "Parcours sur glace", detail: "Le tracé illuminé suit les rues du domaine.", x: 52, y: 48 },
   { id: "restauration", label: "Restauration", detail: "Casse-croûte et aires de rassemblement chauffées.", x: 38, y: 66 },
   { id: "hebergements", label: "Hébergements", detail: "Chalets, villas, cabanas, Coolbox et condos-hôtel.", x: 72, y: 33 },
-  { id: "lac", label: "Le lac", detail: "Cœur du domaine de 263 acres.", x: 62, y: 70 },
+  { id: "lac", label: "Le lac", detail: "Un grand repère au cœur du camping.", x: 62, y: 70 },
 ];
 
 export function HavanaMap() {
@@ -40,7 +40,7 @@ export function HavanaMap() {
           La carte du <span className="text-ice">Havana Resort.</span>
         </h2>
         <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          263 acres, un lac, des rues nommées et des hébergements quatre-saisons.
+          Un vaste camping, un lac, des rues nommées et des hébergements quatre-saisons.
           Déplacez et agrandissez la carte, puis touchez un repère pour en savoir plus.
         </p>
 

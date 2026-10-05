@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { StickyCta } from "@/components/site/StickyCta";
+import { InstallPrompt } from "@/components/site/InstallPrompt";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -90,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Un parcours sur glace illuminé de 263 acres au Havana Resort, Maricourt (Québec).",
+          "Le plus grand événement de glace au Canada prend vie au Camping Havana Resort, à Maricourt.",
       },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "fr_CA" },
@@ -107,7 +108,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/icon-192.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   }),
 
@@ -141,6 +144,7 @@ function RootComponent() {
       <Outlet />
       <Footer />
       <StickyCta />
+      <InstallPrompt />
     </QueryClientProvider>
   );
 }
