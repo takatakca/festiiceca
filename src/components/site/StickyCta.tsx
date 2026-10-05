@@ -19,7 +19,7 @@ export function StickyCta() {
     >
       <Link
         to="/billets"
-        className="surface-frost flex items-center justify-center rounded-full bg-primary/95 py-4 text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground glow"
+        className="surface-frost flex items-center justify-center rounded-md bg-primary/95 py-4 text-sm font-bold uppercase text-primary-foreground glow"
       >
         Choisir mes billets
       </Link>

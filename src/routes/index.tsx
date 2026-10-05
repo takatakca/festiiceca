@@ -8,6 +8,9 @@ import {
   Users,
   MapPin,
   Clock,
+  Store,
+  Flame,
+  TicketCheck,
 } from "lucide-react";
 import heroImg from "@/assets/hero-festi-ice.jpg";
 import tunnelImg from "@/assets/ambiance-tunnel.jpg";
@@ -37,7 +40,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Patinage extérieur illuminé au Havana Resort de Maricourt : 263 acres, un parcours continu, une musique différente chaque soirée. Activité d'hiver familiale dans les Cantons-de-l'Est.",
+          "Le plus grand événement de glace au Canada transforme le Camping Havana Resort en parcours illuminé, animé par la musique, les kiosques et l'hiver québécois.",
       },
       { property: "og:title", content: "FESTI-ICE — Patinez dans la lumière" },
       {
@@ -76,6 +79,7 @@ function Home() {
         <Journey />
         <Programming />
         <Highlights />
+        <FestivalVillage />
         <Havana />
         <HavanaGallery />
         <HavanaMap />
@@ -94,7 +98,7 @@ function Home() {
 function Hero() {
   const { season } = useSiteContent();
   return (
-    <section className="relative flex min-h-[92svh] items-end overflow-hidden">
+    <section className="hero-stage relative flex min-h-[92svh] items-end overflow-hidden">
       <img
         src={heroImg}
         alt="Patineurs sur un parcours de glace illuminé la nuit, entouré de structures lumineuses"
@@ -103,51 +107,47 @@ function Hero() {
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-[var(--gradient-night)]" />
-      <div className="absolute inset-0 bg-midnight/35" />
+      <div className="absolute inset-0 bg-midnight/20" />
 
-      <div className="relative mx-auto w-full max-w-7xl px-4 pb-16 pt-32 sm:px-6 lg:pb-24">
+      <div className="relative mx-auto w-full max-w-7xl px-4 pb-14 pt-32 sm:px-6 lg:pb-20">
         {season.isInauguralSeason && (
           <p className="eyebrow mb-4">Saison inaugurale · {season.label}</p>
         )}
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-silver">
-          Maricourt, Québec
+        <p className="text-xs font-semibold uppercase text-silver">
+          Camping Havana Resort · Maricourt, Québec
         </p>
-        <h1 className="mt-4 text-[clamp(2.75rem,12vw,7.5rem)]">
-          Patinez
-          <br />
-          dans la
-          <br />
-          <span className="text-ice">lumière.</span>
+        <h1 className="mt-4 max-w-5xl text-[clamp(3rem,10vw,7.5rem)]">
+          Le plus grand événement de glace <span className="text-ice">au Canada.</span>
         </h1>
         <p className="mt-6 max-w-lg text-base text-silver sm:text-lg">
-          Un parcours sur glace illuminé au cœur du Havana Resort, où musique,
-          lumière et hiver se rencontrent.
+          Pour sa toute première édition, FESTI-ICE transforme les rues du plus
+          grand camping au Canada en un parcours de glace, de lumière et de fête.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             to="/billets"
-            className="rounded-full bg-primary px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground glow"
+            className="festival-button bg-primary text-primary-foreground glow"
           >
             Billets
           </Link>
           <a
             href="#experience"
-            className="rounded-full border border-polar/40 px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-foreground backdrop-blur-sm"
+            className="festival-button border border-polar/40 text-foreground backdrop-blur-sm"
           >
             Découvrir l'expérience
           </a>
         </div>
 
-        <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-xs font-semibold uppercase tracking-[0.16em] text-silver">
+        <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-xs font-semibold uppercase text-silver">
           <li className="flex items-center gap-2">
             <MapPin size={14} className="text-primary" /> Havana Resort
           </li>
           <li className="flex items-center gap-2">
-            <Users size={14} className="text-primary" /> Expérience familiale
+            <Store size={14} className="text-warm" /> Kiosques & marchands
           </li>
           <li className="flex items-center gap-2">
-            <Music4 size={14} className="text-primary" /> Soirées musicales
+            <Music4 size={14} className="text-coral" /> Soirées musicales
           </li>
         </ul>
       </div>
@@ -180,8 +180,8 @@ function WhatIs() {
             parcours, lui, ne s'interrompt jamais.
           </p>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-            Un domaine naturel de {venue.acres} acres devient, le temps d'une
-            soirée d'hiver, un seul grand terrain de jeu illuminé.
+            Le plus grand camping au Canada devient, le temps d'une soirée d'hiver,
+            un immense terrain de jeu illuminé.
           </p>
         </div>
         <div className="relative">
@@ -519,6 +519,59 @@ function Highlights() {
   );
 }
 
+function FestivalVillage() {
+  const moments = [
+    {
+      icon: Store,
+      title: "Marchands & boutiques",
+      copy: "Des découvertes locales et des arrêts animés au fil des rues du camping.",
+      photo: havanaPhotos.playera,
+    },
+    {
+      icon: Flame,
+      title: "Kiosques & foyers",
+      copy: "Des pauses chaleureuses, de la restauration et des lieux où se retrouver.",
+      photo: havanaPhotos.foyer,
+    },
+    {
+      icon: TicketCheck,
+      title: "Une vraie destination",
+      copy: "Une soirée complète à vivre sur glace, entre musique, lumière et installations.",
+      photo: havanaPhotos.rueGuirlandes,
+    },
+  ];
+
+  return (
+    <section className="festival-village border-y border-border/60 px-4 py-20 sm:px-6 lg:py-28">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:items-end">
+          <div>
+            <p className="eyebrow">Le village FESTI-ICE</p>
+            <h2 className="mt-4 text-[clamp(2rem,6vw,4rem)]">Bien plus qu'une <span className="text-ice">patinoire.</span></h2>
+          </div>
+          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground lg:justify-self-end">
+            Les rues du camping deviennent un village d'hiver vivant : kiosques,
+            marchands, boutiques, musique et espaces chaleureux ponctuent le parcours.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {moments.map((moment) => (
+            <article key={moment.title} className="group relative min-h-96 overflow-hidden rounded-lg border border-border/60">
+              <img src={moment.photo.url} alt={moment.photo.altFr} width={moment.photo.width} height={moment.photo.height} loading="lazy" decoding="async" style={{ objectPosition: moment.photo.focal }} className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_15%,var(--background)_100%)]" />
+              <div className="absolute inset-x-0 bottom-0 p-6">
+                <moment.icon className="mb-4 size-6 text-warm" />
+                <h3 className="text-xl">{moment.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-silver">{moment.copy}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* 07 — HAVANA */
 function Havana() {
   return (
@@ -535,15 +588,15 @@ function Havana() {
       <div className="relative mx-auto max-w-7xl px-4 py-28 sm:px-6 lg:py-40">
         <p className="eyebrow">Le lieu</p>
         <h2 className="mt-4 text-[clamp(2.25rem,8vw,5rem)]">
-          {venue.acres} acres
+          Le plus grand camping
           <br />
-          à découvrir
+          au Canada
           <br />
           <span className="text-ice">sur glace.</span>
         </h2>
         <p className="mt-6 max-w-xl text-base text-silver">
-          FESTI-ICE prend vie au Havana Resort, un vaste domaine naturel de
-          Maricourt dans les Cantons-de-l'Est.
+          FESTI-ICE prend vie au Camping Havana Resort. Ses rues, ses bâtiments
+          et ses espaces de rassemblement deviennent un immense village sur glace.
         </p>
         <dl className="mt-12 grid max-w-2xl gap-6 sm:grid-cols-3">
           {venue.travelTimes.map((t) => (

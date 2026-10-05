@@ -9,7 +9,7 @@ export function Footer() {
         <div>
           <FestiIceLogo variant="footer" />
           <p className="mt-5 max-w-xs text-sm text-muted-foreground">
-            Un parcours sur glace illuminé au cœur du Havana Resort, à Maricourt.
+            Le plus grand événement de glace au Canada, au Camping Havana Resort.
           </p>
           {season.isInauguralSeason && (
             <p className="eyebrow mt-4">Saison inaugurale {season.label}</p>
@@ -52,7 +52,7 @@ export function Footer() {
           </p>
           <Link
             to="/billets"
-            className="mt-5 inline-block rounded-full border border-primary/60 px-5 py-2 text-xs font-bold uppercase tracking-[0.18em] text-primary"
+            className="festival-button mt-5 border border-primary/60 text-primary"
           >
             Choisir mes billets
           </Link>
