@@ -484,6 +484,7 @@ export type Database = {
           gst_cents: number
           hold_id: string | null
           id: string
+          marketing_consent_at: string | null
           order_number: string
           paid_at: string | null
           qst_cents: number
@@ -507,6 +508,7 @@ export type Database = {
           gst_cents?: number
           hold_id?: string | null
           id?: string
+          marketing_consent_at?: string | null
           order_number: string
           paid_at?: string | null
           qst_cents?: number
@@ -530,6 +532,7 @@ export type Database = {
           gst_cents?: number
           hold_id?: string | null
           id?: string
+          marketing_consent_at?: string | null
           order_number?: string
           paid_at?: string | null
           qst_cents?: number

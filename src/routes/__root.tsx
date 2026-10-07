@@ -15,6 +15,9 @@ import { Footer } from "@/components/site/Footer";
 import { StickyCta } from "@/components/site/StickyCta";
 import { InstallPrompt } from "@/components/site/InstallPrompt";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { CookieBanner } from "@/consent/CookieBanner";
+import { seoHead } from "@/seo/head";
+import { jsonLdScript, siteJsonLd, websiteJsonLd } from "@/seo/jsonld";
 
 function NotFoundComponent() {
   return (
@@ -81,21 +84,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "FESTI-ICE — Patinez dans la lumière | Havana Resort, Maricourt" },
-      {
-        name: "description",
-        content:
-          "FESTI-ICE : un parcours sur glace illuminé au cœur du Havana Resort, à Maricourt. Musique, lumière et hiver québécois, pour toute la famille.",
-      },
-      { property: "og:title", content: "FESTI-ICE — Patinez dans la lumière" },
-      {
-        property: "og:description",
-        content:
-          "Le plus grand événement de glace au Canada prend vie au Camping Havana Resort, à Maricourt.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:locale", content: "fr_CA" },
-      { name: "twitter:card", content: "summary_large_image" },
+      // Default French title, description, Open Graph, Twitter and share image (src/site.config.ts).
+      ...seoHead().meta,
     ],
     links: [
       {
@@ -112,6 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/icon-192.png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
     ],
+    scripts: [jsonLdScript([siteJsonLd(), websiteJsonLd()])],
   }),
 
   shellComponent: RootShell,
@@ -128,6 +119,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <CookieBanner />
         <Scripts />
       </body>
     </html>

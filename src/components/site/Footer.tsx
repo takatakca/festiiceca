@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { season, support, venue } from "@/lib/festi-data";
 import { FestiIceLogo } from "@/components/site/FestiIceLogo";
+import { ManageCookiesLink } from "@/consent/ManageCookiesLink";
 
 export function Footer() {
   return (
@@ -62,6 +63,7 @@ export function Footer() {
       <div className="border-t border-border/50 px-4 py-6 text-center text-xs text-muted-foreground sm:px-6">
         © {new Date().getFullYear()} FESTI-ICE. Tous droits réservés. FESTI-ICE se
         déroule au Havana Resort, Maricourt (Québec).
+        <ManageCookiesLink className="ml-3 underline-offset-2 hover:underline" />
       </div>
     </footer>
   );

@@ -17,6 +17,7 @@ import {
   timeSlots,
   venue,
 } from "@/lib/festi-data";
+import { seoHead } from "@/seo/head";
 
 type Search = { date?: string | undefined; theme?: string | undefined };
 
@@ -25,24 +26,14 @@ export const Route = createFileRoute("/billets")({
     date: typeof search["date"] === "string" ? search["date"] : undefined,
     theme: typeof search["theme"] === "string" ? search["theme"] : undefined,
   }),
-  head: () => ({
-    meta: [
-      { title: "Billets FESTI-ICE — Patinage illuminé au Havana Resort" },
-      {
-        name: "description",
-        content:
-          "Choisissez votre date, votre séance et vos billets pour FESTI-ICE, le parcours sur glace illuminé du Havana Resort à Maricourt.",
-      },
-      { property: "og:title", content: "Billets FESTI-ICE" },
-      {
-        property: "og:description",
-        content:
-          "Calendrier, séances d'arrivée, tarifs familiaux et Option Flex Météo. Achat en ligne sécurisé.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  // Checkout flow, and payment is not connected yet: keep it out of search results (noindex).
+  head: () =>
+    seoHead({
+      title: "Billets FESTI-ICE — Patinage illuminé au Havana Resort",
+      description:
+        "Choisissez votre date, votre séance et vos billets pour FESTI-ICE, le parcours sur glace illuminé du Havana Resort à Maricourt.",
+      noindex: true,
+    }),
   component: BilletsPage,
 });
 
@@ -83,6 +74,9 @@ function BilletsPage() {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [flex, setFlex] = useState(false);
   const [promo, setPromo] = useState("");
+  // CASL: news/offers opt-in, unticked by default; the date of the tick is the proof of consent.
+  // Save it as orders.marketing_consent_at when orders are written (null = no consent).
+  const [marketingConsentAt, setMarketingConsentAt] = useState<string | null>(null);
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(search.date ? 2 : 1);
   const [placed, setPlaced] = useState(false);
 
@@ -396,7 +390,14 @@ function BilletsPage() {
                 </div>
               </div>
               <label className="mt-5 flex items-start gap-3 text-xs text-muted-foreground">
-                <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[var(--cyan-ice)]" />
+                <input
+                  type="checkbox"
+                  checked={marketingConsentAt !== null}
+                  onChange={(e) =>
+                    setMarketingConsentAt(e.target.checked ? new Date().toISOString() : null)
+                  }
+                  className="mt-0.5 h-4 w-4 accent-[var(--cyan-ice)]"
+                />
                 Je souhaite recevoir les nouvelles et offres FESTI-ICE. (facultatif)
               </label>
               <button
@@ -618,8 +619,9 @@ function Success({
       </div>
       <h1 className="mt-8 text-4xl sm:text-5xl">À bientôt sur la glace.</h1>
       <p className="mt-4 text-sm text-muted-foreground">
-        Votre commande est enregistrée. Les billets QR seront transmis par courriel
-        dès l'activation du module de paiement.
+        {/* Payment is not connected yet: say so, never claim a payment or a saved order. */}
+        Aucun paiement n'a été effectué et aucun billet n'a été émis. Le module de paiement est
+        branché à la prochaine phase.
       </p>
       <dl className="surface-frost mt-8 space-y-3 rounded-2xl p-6 text-left text-sm">
         <Row
@@ -629,7 +631,7 @@ function Success({
         <Row label="Séance d'arrivée" value={slot ?? "—"} />
         <Row label="Ambiance de la soirée" value={program ?? "—"} />
         <Row label="Billets" value={String(tickets)} />
-        <Row label="Total payé" value={formatCents(total)} />
+        <Row label="Total" value={formatCents(total)} />
       </dl>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <a

@@ -31,27 +31,17 @@ import {
   SiteContentProvider,
   useSiteContent,
 } from "@/lib/site-content";
+import { seoHead } from "@/seo/head";
 
 export const Route = createFileRoute("/")({
   loader: () => getSiteContent(),
-  head: () => ({
-    meta: [
-      { title: "FESTI-ICE — Patinez dans la lumière | Maricourt, Québec" },
-      {
-        name: "description",
-        content:
-          "Le plus grand événement de glace au Canada transforme le Camping Havana Resort en parcours illuminé, animé par la musique, les kiosques et l'hiver québécois.",
-      },
-      { property: "og:title", content: "FESTI-ICE — Patinez dans la lumière" },
-      {
-        property: "og:description",
-        content:
-          "Un parcours sur glace illuminé au cœur du Havana Resort. Une seule expérience, jamais la même ambiance.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () =>
+    seoHead({
+      title: "FESTI-ICE — Patinez dans la lumière | Maricourt, Québec",
+      description:
+        "Le plus grand événement de glace au Canada transforme le Camping Havana Resort en parcours illuminé, animé par la musique, les kiosques et l'hiver québécois.",
+      path: "/",
+    }),
   errorComponent: () => (
     <main className="mx-auto max-w-2xl px-4 py-32">
       <h1 className="text-3xl">Contenu momentanément indisponible</h1>
