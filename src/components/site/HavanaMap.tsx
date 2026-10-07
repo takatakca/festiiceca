@@ -13,11 +13,35 @@ type Poi = {
 
 /** Approximate positions on the official resort map, used for orientation only. */
 const pois: Poi[] = [
-  { id: "accueil", label: "Accueil", detail: "Arrivée, billetterie et validation des codes QR.", x: 16, y: 62 },
+  {
+    id: "accueil",
+    label: "Accueil",
+    detail: "Arrivée, billetterie et validation des codes QR.",
+    x: 16,
+    y: 62,
+  },
   { id: "stationnement", label: "Stationnement", detail: "Sur place, gratuit.", x: 9, y: 40 },
-  { id: "parcours", label: "Parcours sur glace", detail: "Le tracé illuminé suit les rues du domaine.", x: 52, y: 48 },
-  { id: "restauration", label: "Restauration", detail: "Casse-croûte et aires de rassemblement chauffées.", x: 38, y: 66 },
-  { id: "hebergements", label: "Hébergements", detail: "Chalets, villas, cabanas, Coolbox et condos-hôtel.", x: 72, y: 33 },
+  {
+    id: "parcours",
+    label: "Parcours sur glace",
+    detail: "Le tracé illuminé suit les rues du domaine.",
+    x: 52,
+    y: 48,
+  },
+  {
+    id: "restauration",
+    label: "Restauration",
+    detail: "Casse-croûte et aires de rassemblement chauffées.",
+    x: 38,
+    y: 66,
+  },
+  {
+    id: "hebergements",
+    label: "Hébergements",
+    detail: "Chalets, villas, cabanas, Coolbox et condos-hôtel.",
+    x: 72,
+    y: 33,
+  },
   { id: "lac", label: "Le lac", detail: "Un grand repère au cœur du camping.", x: 62, y: 70 },
 ];
 
@@ -40,8 +64,8 @@ export function HavanaMap() {
           La carte du <span className="text-ice">Havana Resort.</span>
         </h2>
         <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Un vaste camping, un lac, des rues nommées et des hébergements quatre-saisons.
-          Déplacez et agrandissez la carte, puis touchez un repère pour en savoir plus.
+          Un vaste camping, un lac, des rues nommées et des hébergements quatre-saisons. Déplacez et
+          agrandissez la carte, puis touchez un repère pour en savoir plus.
         </p>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.6fr_1fr]">

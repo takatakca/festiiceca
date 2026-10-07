@@ -35,9 +35,7 @@ export function resolveContent(content: SiteContent | null | undefined): Resolve
   return {
     season: content.season ?? fallback.season,
     status: content.status,
-    routeSegments: content.routeSegments.length
-      ? content.routeSegments
-      : fallback.routeSegments,
+    routeSegments: content.routeSegments.length ? content.routeSegments : fallback.routeSegments,
     programs: content.programs.length ? content.programs : fallback.programs,
     faq: content.faq.length ? content.faq : fallback.faq,
     accommodations: content.accommodations.length

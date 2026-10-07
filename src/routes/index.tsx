@@ -19,18 +19,9 @@ import familleImg from "@/assets/ambiance-famille.jpg";
 import { havanaPhotos } from "@/lib/havana-media";
 import { HavanaGallery } from "@/components/site/HavanaGallery";
 import { HavanaMap } from "@/components/site/HavanaMap";
-import {
-  formatCents,
-  practicalInfo,
-  ticketTypes,
-  venue,
-} from "@/lib/festi-data";
+import { formatCents, practicalInfo, ticketTypes, venue } from "@/lib/festi-data";
 import { getSiteContent } from "@/lib/content.functions";
-import {
-  resolveContent,
-  SiteContentProvider,
-  useSiteContent,
-} from "@/lib/site-content";
+import { resolveContent, SiteContentProvider, useSiteContent } from "@/lib/site-content";
 
 export const Route = createFileRoute("/")({
   loader: () => getSiteContent(),
@@ -55,9 +46,7 @@ export const Route = createFileRoute("/")({
   errorComponent: () => (
     <main className="mx-auto max-w-2xl px-4 py-32">
       <h1 className="text-3xl">Contenu momentanément indisponible</h1>
-      <p className="mt-4 text-muted-foreground">
-        Rechargez la page dans quelques instants.
-      </p>
+      <p className="mt-4 text-muted-foreground">Rechargez la page dans quelques instants.</p>
     </main>
   ),
   notFoundComponent: () => (
@@ -93,7 +82,6 @@ function Home() {
   );
 }
 
-
 /* 01 — HERO */
 function Hero() {
   const { season } = useSiteContent();
@@ -120,15 +108,12 @@ function Hero() {
           Le plus grand événement de glace <span className="text-ice">au Canada.</span>
         </h1>
         <p className="mt-6 max-w-lg text-base text-silver sm:text-lg">
-          Pour sa toute première édition, FESTI-ICE transforme les rues du plus
-          grand camping au Canada en un parcours de glace, de lumière et de fête.
+          Pour sa toute première édition, FESTI-ICE transforme les rues du plus grand camping au
+          Canada en un parcours de glace, de lumière et de fête.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            to="/billets"
-            className="festival-button bg-primary text-primary-foreground glow"
-          >
+          <Link to="/billets" className="festival-button bg-primary text-primary-foreground glow">
             Billets
           </Link>
           <a
@@ -174,14 +159,13 @@ function WhatIs() {
             <span className="text-ice">Jamais la même ambiance.</span>
           </h2>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
-            À FESTI-ICE, on ne visite pas une série d'attractions séparées. On
-            patine à travers le Havana Resort lui-même. De rue en rue, la
-            lumière change, la musique change, l'atmosphère change — mais le
-            parcours, lui, ne s'interrompt jamais.
+            À FESTI-ICE, on ne visite pas une série d'attractions séparées. On patine à travers le
+            Havana Resort lui-même. De rue en rue, la lumière change, la musique change,
+            l'atmosphère change — mais le parcours, lui, ne s'interrompt jamais.
           </p>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-            Le plus grand camping au Canada devient, le temps d'une soirée d'hiver,
-            un immense terrain de jeu illuminé.
+            Le plus grand camping au Canada devient, le temps d'une soirée d'hiver, un immense
+            terrain de jeu illuminé.
           </p>
         </div>
         <div className="relative">
@@ -251,12 +235,16 @@ function OneWorld() {
           className="mt-10 aspect-[16/9] w-full rounded-2xl border border-border/40 object-cover"
         />
 
-
         <div className="mt-14 grid gap-12 lg:grid-cols-[1fr_1.1fr]">
           {/* luminous route visualization */}
           <div className="lg:sticky lg:top-28 lg:h-fit">
             <div className="surface-frost rounded-2xl p-6">
-              <svg viewBox="0 0 200 320" className="w-full" role="img" aria-label="Tracé lumineux du parcours FESTI-ICE">
+              <svg
+                viewBox="0 0 200 320"
+                className="w-full"
+                role="img"
+                aria-label="Tracé lumineux du parcours FESTI-ICE"
+              >
                 <path
                   d="M30 300 C 20 240 70 230 60 180 C 52 138 130 140 128 100 C 126 62 80 60 100 20"
                   fill="none"
@@ -322,7 +310,10 @@ function OneWorld() {
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   {String(s.order).padStart(2, "0")} · {s.street}
                 </p>
-                <h3 className="mt-2 text-2xl" style={{ color: i === active ? s.accent : undefined }}>
+                <h3
+                  className="mt-2 text-2xl"
+                  style={{ color: i === active ? s.accent : undefined }}
+                >
                   {s.name}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -355,8 +346,7 @@ function Journey() {
       <div className="mx-auto max-w-7xl">
         <p className="eyebrow">Le déroulement</p>
         <h2 className="mt-4 max-w-2xl text-[clamp(2rem,6vw,3.5rem)]">
-          De la voiture <span className="text-ice">à la glace</span> en quelques
-          minutes.
+          De la voiture <span className="text-ice">à la glace</span> en quelques minutes.
         </h2>
         <ol className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-3">
           {steps.map((s, i) => (
@@ -377,9 +367,7 @@ function Journey() {
 /* 05 — PROGRAMMING */
 function Programming() {
   const { programs } = useSiteContent();
-  const [selected, setSelected] = useState(
-    (programs[2] ?? programs[0])!.dayIndex,
-  );
+  const [selected, setSelected] = useState((programs[2] ?? programs[0])!.dayIndex);
   const p = programs.find((x) => x.dayIndex === selected) ?? programs[0]!;
 
   return (
@@ -547,17 +535,31 @@ function FestivalVillage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:items-end">
           <div>
             <p className="eyebrow">Le village FESTI-ICE</p>
-            <h2 className="mt-4 text-[clamp(2rem,6vw,4rem)]">Bien plus qu'une <span className="text-ice">patinoire.</span></h2>
+            <h2 className="mt-4 text-[clamp(2rem,6vw,4rem)]">
+              Bien plus qu'une <span className="text-ice">patinoire.</span>
+            </h2>
           </div>
           <p className="max-w-2xl text-base leading-relaxed text-muted-foreground lg:justify-self-end">
-            Les rues du camping deviennent un village d'hiver vivant : kiosques,
-            marchands, boutiques, musique et espaces chaleureux ponctuent le parcours.
+            Les rues du camping deviennent un village d'hiver vivant : kiosques, marchands,
+            boutiques, musique et espaces chaleureux ponctuent le parcours.
           </p>
         </div>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {moments.map((moment) => (
-            <article key={moment.title} className="group relative min-h-96 overflow-hidden rounded-lg border border-border/60">
-              <img src={moment.photo.url} alt={moment.photo.altFr} width={moment.photo.width} height={moment.photo.height} loading="lazy" decoding="async" style={{ objectPosition: moment.photo.focal }} className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <article
+              key={moment.title}
+              className="group relative min-h-96 overflow-hidden rounded-lg border border-border/60"
+            >
+              <img
+                src={moment.photo.url}
+                alt={moment.photo.altFr}
+                width={moment.photo.width}
+                height={moment.photo.height}
+                loading="lazy"
+                decoding="async"
+                style={{ objectPosition: moment.photo.focal }}
+                className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_15%,var(--background)_100%)]" />
               <div className="absolute inset-x-0 bottom-0 p-6">
                 <moment.icon className="mb-4 size-6 text-warm" />
@@ -595,8 +597,8 @@ function Havana() {
           <span className="text-ice">sur glace.</span>
         </h2>
         <p className="mt-6 max-w-xl text-base text-silver">
-          FESTI-ICE prend vie au Camping Havana Resort. Ses rues, ses bâtiments
-          et ses espaces de rassemblement deviennent un immense village sur glace.
+          FESTI-ICE prend vie au Camping Havana Resort. Ses rues, ses bâtiments et ses espaces de
+          rassemblement deviennent un immense village sur glace.
         </p>
         <dl className="mt-12 grid max-w-2xl gap-6 sm:grid-cols-3">
           {venue.travelTimes.map((t) => (
@@ -635,7 +637,6 @@ function Havana() {
             </p>
           </address>
         </div>
-
       </div>
     </section>
   );
@@ -654,9 +655,8 @@ function Stay() {
           <span className="text-ice">Restez dormir.</span>
         </h2>
         <p className="mt-6 max-w-xl text-sm text-muted-foreground">
-          Le Havana Resort dispose de son propre inventaire d'hébergement
-          quatre-saisons sur le domaine. Les forfaits combinés avec FESTI-ICE ne
-          sont pas encore en vente.
+          Le Havana Resort dispose de son propre inventaire d'hébergement quatre-saisons sur le
+          domaine. Les forfaits combinés avec FESTI-ICE ne sont pas encore en vente.
         </p>
         <ul className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-5">
           {accommodations.map((a) => (
@@ -696,8 +696,8 @@ function Practical() {
           ))}
         </dl>
         <p className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
-          <Clock size={14} /> La durée moyenne du parcours et les détails de
-          location de patins seront confirmés avant l'ouverture.
+          <Clock size={14} /> La durée moyenne du parcours et les détails de location de patins
+          seront confirmés avant l'ouverture.
         </p>
       </div>
     </section>
@@ -722,16 +722,14 @@ function Tickets() {
               <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 {t.nameFr}
               </p>
-              <p className="mt-3 font-display text-3xl text-ice">
-                {formatCents(t.priceCents)}
-              </p>
+              <p className="mt-3 font-display text-3xl text-ice">{formatCents(t.priceCents)}</p>
               <p className="mt-3 text-xs text-muted-foreground">{t.descriptionFr}</p>
             </li>
           ))}
         </ul>
         <p className="mt-6 text-sm text-muted-foreground">
-          Billet ouvert et tarif de groupe (15 personnes et plus) offerts à la
-          billetterie. Taxes en sus, affichées avant le paiement.
+          Billet ouvert et tarif de groupe (15 personnes et plus) offerts à la billetterie. Taxes en
+          sus, affichées avant le paiement.
         </p>
         <Link
           to="/billets"
@@ -800,9 +798,7 @@ function Faq() {
         <div className="mt-12 space-y-10">
           {faq.map((group) => (
             <div key={group.group}>
-              <h3 className="text-sm tracking-[0.2em] text-muted-foreground">
-                {group.group}
-              </h3>
+              <h3 className="text-sm tracking-[0.2em] text-muted-foreground">{group.group}</h3>
               <div className="mt-4 divide-y divide-border/50 border-y border-border/50">
                 {group.items.map((item) => (
                   <details key={item.q} className="group py-4">
@@ -813,9 +809,7 @@ function Faq() {
                         className="shrink-0 text-primary transition-transform group-open:rotate-180"
                       />
                     </summary>
-                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                      {item.a}
-                    </p>
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.a}</p>
                   </details>
                 ))}
               </div>

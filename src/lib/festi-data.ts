@@ -14,12 +14,7 @@ export const season = {
   isInauguralSeason: true,
   slogan: "Patinez dans la lumière.",
   operationalStatus: "OPEN" as
-    | "OPEN"
-    | "OPEN_WITH_ADVISORY"
-    | "PARTIAL"
-    | "DELAYED"
-    | "CLOSED"
-    | "CANCELLED",
+    "OPEN" | "OPEN_WITH_ADVISORY" | "PARTIAL" | "DELAYED" | "CLOSED" | "CANCELLED",
   advisory: "",
 };
 
@@ -265,8 +260,7 @@ export const ticketTypes: TicketType[] = [
     id: "tt-family",
     code: "FAMILY",
     nameFr: "Passe familiale",
-    descriptionFr:
-      "Tarif par billet. Minimum 3 billets, maximum 6 billets, maximum 2 adultes.",
+    descriptionFr: "Tarif par billet. Minimum 3 billets, maximum 6 billets, maximum 2 adultes.",
     priceCents: 2195,
     minimumQuantity: 3,
     maximumQuantity: 6,
@@ -280,8 +274,7 @@ export const ticketTypes: TicketType[] = [
     id: "tt-open",
     code: "OPEN_DATE",
     nameFr: "Billet ouvert",
-    descriptionFr:
-      "Valide à toute date de la saison FESTI-ICE, selon les disponibilités.",
+    descriptionFr: "Valide à toute date de la saison FESTI-ICE, selon les disponibilités.",
     priceCents: 3995,
     minimumQuantity: 0,
     maximumQuantity: 10,

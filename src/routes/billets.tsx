@@ -1,13 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import {
-  ArrowLeft,
-  Check,
-  Minus,
-  Plus,
-  ShieldCheck,
-  Ticket,
-} from "lucide-react";
+import { ArrowLeft, Check, Minus, Plus, ShieldCheck, Ticket } from "lucide-react";
 import {
   flexOption,
   formatCents,
@@ -112,8 +105,7 @@ function BilletsPage() {
   const familyQty = quantities["tt-family"] ?? 0;
   if (familyQty > 0 && familyQty < 3)
     errors.push("La passe familiale exige un minimum de 3 billets.");
-  if (familyQty > 6)
-    errors.push("La passe familiale est limitée à 6 billets.");
+  if (familyQty > 6) errors.push("La passe familiale est limitée à 6 billets.");
   const adultsWithFamily = ticketTypes
     .filter((t) => t.countsAsAdult)
     .reduce((n, t) => n + (quantities[t.id] ?? 0), 0);
@@ -143,7 +135,15 @@ function BilletsPage() {
   }, [cursor]);
 
   if (placed) {
-    return <Success date={selectedDate} slot={slot} tickets={totalTickets} total={total} program={program?.title} />;
+    return (
+      <Success
+        date={selectedDate}
+        slot={slot}
+        tickets={totalTickets}
+        total={total}
+        program={program?.title}
+      />
+    );
   }
 
   return (
@@ -159,8 +159,7 @@ function BilletsPage() {
         Vos billets <span className="text-ice">FESTI-ICE</span>
       </h1>
       <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-        Date, séance d'arrivée, billets, paiement. Quatre étapes, aucun frais
-        surprise.
+        Date, séance d'arrivée, billets, paiement. Quatre étapes, aucun frais surprise.
       </p>
 
       <Steps step={step} />
@@ -173,9 +172,7 @@ function BilletsPage() {
               <button
                 type="button"
                 aria-label="Mois précédent"
-                onClick={() =>
-                  setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))
-                }
+                onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}
                 className="rounded-full border border-border px-3 py-1.5 text-sm"
               >
                 ‹
@@ -186,9 +183,7 @@ function BilletsPage() {
               <button
                 type="button"
                 aria-label="Mois suivant"
-                onClick={() =>
-                  setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))
-                }
+                onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}
                 className="rounded-full border border-border px-3 py-1.5 text-sm"
               >
                 ›
@@ -256,7 +251,9 @@ function BilletsPage() {
             <Panel active n="02" title="Choisir votre heure d'arrivée">
               {program && (
                 <div className="mb-5 rounded-xl border border-primary/25 bg-primary/5 p-4">
-                  <p className="eyebrow">{program.dayLongFr} · {program.styles}</p>
+                  <p className="eyebrow">
+                    {program.dayLongFr} · {program.styles}
+                  </p>
                   <p className="font-display text-xl">{program.title}</p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {program.startTime} – {program.endTime} · {program.note}
@@ -296,9 +293,7 @@ function BilletsPage() {
                     <li key={t.id} className="flex items-center gap-4 py-4">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold">{t.nameFr}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          {t.descriptionFr}
-                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">{t.descriptionFr}</p>
                         <p className="mt-1 text-sm font-bold text-primary">
                           {formatCents(t.priceCents)}
                         </p>
@@ -416,9 +411,8 @@ function BilletsPage() {
                 <ShieldCheck className="mx-auto mb-3 text-primary" />
                 <p className="text-sm font-semibold">Paiement sécurisé</p>
                 <p className="mx-auto mt-2 max-w-sm text-xs text-muted-foreground">
-                  Le module de paiement (carte, Apple&nbsp;Pay, Google&nbsp;Pay) est
-                  branché à la prochaine phase, avec vérification serveur et émission
-                  des billets QR.
+                  Le module de paiement (carte, Apple&nbsp;Pay, Google&nbsp;Pay) est branché à la
+                  prochaine phase, avec vérification serveur et émission des billets QR.
                 </p>
               </div>
               <div className="mt-5">
@@ -452,11 +446,14 @@ function BilletsPage() {
           <div className="surface-frost rounded-2xl p-5">
             <p className="eyebrow">Votre commande</p>
             <dl className="mt-4 space-y-2 text-sm">
-              <Row label="Date" value={
-                selectedDate
-                  ? `${selectedDate.getDate()} ${MONTHS[selectedDate.getMonth()]}`
-                  : "—"
-              } />
+              <Row
+                label="Date"
+                value={
+                  selectedDate
+                    ? `${selectedDate.getDate()} ${MONTHS[selectedDate.getMonth()]}`
+                    : "—"
+                }
+              />
               <Row label="Heure" value={slot ?? "—"} />
               <Row label="Ambiance" value={program?.title ?? "—"} />
             </dl>
@@ -486,9 +483,7 @@ function BilletsPage() {
                 <div className="my-3 h-px bg-border/60" />
                 <div className="flex items-baseline justify-between">
                   <span className="font-display text-lg">Total</span>
-                  <span className="font-display text-lg text-ice">
-                    {formatCents(total)}
-                  </span>
+                  <span className="font-display text-lg text-ice">{formatCents(total)}</span>
                 </div>
               </dl>
             )}
@@ -552,15 +547,7 @@ function Panel({
   );
 }
 
-function Row({
-  label,
-  value,
-  muted,
-}: {
-  label: string;
-  value: string;
-  muted?: boolean;
-}) {
+function Row({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
       <dt className={muted ? "text-muted-foreground" : ""}>{label}</dt>
@@ -571,15 +558,7 @@ function Row({
   );
 }
 
-function Field({
-  label,
-  name,
-  type = "text",
-}: {
-  label: string;
-  name: string;
-  type?: string;
-}) {
+function Field({ label, name, type = "text" }: { label: string; name: string; type?: string }) {
   return (
     <div>
       <label
@@ -618,8 +597,8 @@ function Success({
       </div>
       <h1 className="mt-8 text-4xl sm:text-5xl">À bientôt sur la glace.</h1>
       <p className="mt-4 text-sm text-muted-foreground">
-        Votre commande est enregistrée. Les billets QR seront transmis par courriel
-        dès l'activation du module de paiement.
+        Votre commande est enregistrée. Les billets QR seront transmis par courriel dès l'activation
+        du module de paiement.
       </p>
       <dl className="surface-frost mt-8 space-y-3 rounded-2xl p-6 text-left text-sm">
         <Row

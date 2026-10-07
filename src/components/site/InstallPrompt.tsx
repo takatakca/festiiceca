@@ -45,7 +45,13 @@ export function InstallPrompt() {
 
   return (
     <aside className="install-prompt animate-slide-in-right" aria-label="Installer FESTI-ICE">
-      <Button variant="ghost" size="icon" onClick={dismiss} aria-label="Fermer" className="absolute right-2 top-2">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={dismiss}
+        aria-label="Fermer"
+        className="absolute right-2 top-2"
+      >
         <X />
       </Button>
       <div className="flex items-start gap-4 pr-9">
@@ -63,7 +69,8 @@ export function InstallPrompt() {
         </Button>
       ) : ios ? (
         <p className="mt-4 flex items-center gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
-          <Share className="size-4 shrink-0 text-primary" /> Touchez Partager, puis « Sur l’écran d’accueil ».
+          <Share className="size-4 shrink-0 text-primary" /> Touchez Partager, puis « Sur l’écran
+          d’accueil ».
         </p>
       ) : (
         <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">

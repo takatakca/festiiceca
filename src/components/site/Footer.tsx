@@ -60,8 +60,8 @@ export function Footer() {
       </div>
 
       <div className="border-t border-border/50 px-4 py-6 text-center text-xs text-muted-foreground sm:px-6">
-        © {new Date().getFullYear()} FESTI-ICE. Tous droits réservés. FESTI-ICE se
-        déroule au Havana Resort, Maricourt (Québec).
+        © {new Date().getFullYear()} FESTI-ICE. Tous droits réservés. FESTI-ICE se déroule au Havana
+        Resort, Maricourt (Québec).
       </div>
     </footer>
   );

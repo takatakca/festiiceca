@@ -27,8 +27,7 @@ const categories: GalleryCategory[] = [
   {
     id: "lumieres",
     label: "Les lumières",
-    blurb:
-      "Des installations lumineuses grand format déjà présentes sur le domaine.",
+    blurb: "Des installations lumineuses grand format déjà présentes sur le domaine.",
     photos: [
       havanaPhotos.arbreGeant,
       havanaPhotos.fleurs,
@@ -61,8 +60,7 @@ export function HavanaGallery() {
   const photos = category.photos;
   const current = photos[index] ?? photos[0]!;
 
-  const go = (delta: number) =>
-    setIndex((i) => (i + delta + photos.length) % photos.length);
+  const go = (delta: number) => setIndex((i) => (i + delta + photos.length) % photos.length);
 
   const selectCategory = (i: number) => {
     setCatIndex(i);
@@ -77,11 +75,15 @@ export function HavanaGallery() {
           Le Havana Resort, <span className="text-ice">une fois la nuit tombée.</span>
         </h2>
         <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Photos actuelles du domaine qui accueillera FESTI-ICE. Le parcours sur
-          glace sera présenté pour la première fois lors de la saison inaugurale.
+          Photos actuelles du domaine qui accueillera FESTI-ICE. Le parcours sur glace sera présenté
+          pour la première fois lors de la saison inaugurale.
         </p>
 
-        <div className="mt-10 flex flex-wrap gap-2" role="tablist" aria-label="Catégories de photos">
+        <div
+          className="mt-10 flex flex-wrap gap-2"
+          role="tablist"
+          aria-label="Catégories de photos"
+        >
           {categories.map((c, i) => (
             <button
               key={c.id}

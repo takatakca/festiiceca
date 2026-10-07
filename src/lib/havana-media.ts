@@ -34,12 +34,7 @@ export type HavanaPhoto = {
   captionFr: string;
   captionEn: string;
   category:
-    | "HAVANA_DESTINATION"
-    | "EXPERIENCE"
-    | "LIGHT_INSTALLATION"
-    | "FOOD_AREA"
-    | "FAMILY"
-    | "ROUTE";
+    "HAVANA_DESTINATION" | "EXPERIENCE" | "LIGHT_INSTALLATION" | "FOOD_AREA" | "FAMILY" | "ROUTE";
 };
 
 export const havanaPhotos = {
@@ -49,8 +44,7 @@ export const havanaPhotos = {
     width: 1448,
     height: 1086,
     focal: "50% 45%",
-    altFr:
-      "Enseigne lumineuse Havana Resort et voiture vintage éclairées la nuit en forêt",
+    altFr: "Enseigne lumineuse Havana Resort et voiture vintage éclairées la nuit en forêt",
     altEn: "Illuminated Havana Resort sign and vintage car at night in the forest",
     captionFr: "Le Havana Resort, site hôte de FESTI-ICE",
     captionEn: "Havana Resort, home of FESTI-ICE",
@@ -62,8 +56,7 @@ export const havanaPhotos = {
     width: 1086,
     height: 1448,
     focal: "50% 40%",
-    altFr:
-      "Grande fleur lumineuse et cygne décoratif illuminés dans le boisé du Havana Resort",
+    altFr: "Grande fleur lumineuse et cygne décoratif illuminés dans le boisé du Havana Resort",
     altEn: "Giant illuminated flower and decorative swan in the Havana Resort woods",
     captionFr: "Installations lumineuses grand format au Havana Resort",
     captionEn: "Large-scale light installations at Havana Resort",
@@ -251,7 +244,5 @@ export const havanaMap = {
   height: 1242,
   altFr:
     "Carte officielle du Camping Havana Resort montrant les rues, le lac, les chalets et les services",
-  altEn:
-    "Official Camping Havana Resort map showing streets, the lake, chalets and services",
+  altEn: "Official Camping Havana Resort map showing streets, the lake, chalets and services",
 };
-

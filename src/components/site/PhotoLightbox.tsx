@@ -97,9 +97,7 @@ export function PhotoLightbox({
         </button>
       </div>
 
-      <p className="px-4 py-6 text-center text-sm text-silver sm:px-6">
-        {photo.captionFr}
-      </p>
+      <p className="px-4 py-6 text-center text-sm text-silver sm:px-6">{photo.captionFr}</p>
     </div>
   );
 }
