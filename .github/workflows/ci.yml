@@ -31,3 +31,34 @@ jobs:
         run: "npx eslint . --rule 'prettier/prettier: off'"
       - name: Build server
         run: npm run build
+
+      - name: Smoke test SSR and closed checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          PORT=8080 HOST=127.0.0.1 node .output/server/index.mjs >/tmp/festiice-server.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          ready=0
+          for i in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8080/ -o /tmp/festiice-index.html; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat /tmp/festiice-server.log
+            exit 1
+          fi
+          grep -q 'FESTI-ICE' /tmp/festiice-index.html
+          curl --fail --silent http://127.0.0.1:8080/billets -o /tmp/festiice-billets.html
+          grep -q 'billets' /tmp/festiice-billets.html
+          curl --fail --silent http://127.0.0.1:8080/personnel -o /tmp/festiice-personnel.html
+          grep -q 'personnel' /tmp/festiice-personnel.html
+          status=$(curl --silent -o /dev/null -w '%{http_code}' -X POST \
+            -H 'content-type: application/json' --data '{}' http://127.0.0.1:8080/api/checkout)
+          [ "$status" = "503" ]
+          status=$(curl --silent -o /dev/null -w '%{http_code}' -X POST \
+            -H 'content-type: application/json' --data '{}' http://127.0.0.1:8080/api/stripe/webhook)
+          [ "$status" = "503" ]
