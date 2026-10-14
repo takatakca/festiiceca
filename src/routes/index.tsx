@@ -22,10 +22,10 @@ import { HavanaMap } from "@/components/site/HavanaMap";
 import {
   formatCents,
   practicalInfo,
-  ticketTypes,
   venue,
 } from "@/lib/festi-data";
 import { getSiteContent } from "@/lib/content.functions";
+import { getPublicTicketing, type PublicTicketing } from "@/lib/ticketing.functions";
 import {
   resolveContent,
   SiteContentProvider,
@@ -33,7 +33,10 @@ import {
 } from "@/lib/site-content";
 
 export const Route = createFileRoute("/")({
-  loader: () => getSiteContent(),
+  loader: async () => {
+    const [content, ticketing] = await Promise.all([getSiteContent(), getPublicTicketing()]);
+    return { content, ticketing };
+  },
   head: () => ({
     meta: [
       { title: "FESTI-ICE — Patinez dans la lumière | Maricourt, Québec" },
@@ -69,7 +72,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const content = resolveContent(Route.useLoaderData());
+  const { content: siteContent, ticketing } = Route.useLoaderData();
+  const content = resolveContent(siteContent);
   return (
     <SiteContentProvider value={content}>
       <main>
@@ -77,7 +81,7 @@ function Home() {
         <WhatIs />
         <OneWorld />
         <Journey />
-        <Programming />
+        <Programming ticketing={ticketing} />
         <Highlights />
         <FestivalVillage />
         <Havana />
@@ -85,7 +89,7 @@ function Home() {
         <HavanaMap />
         <Stay />
         <Practical />
-        <Tickets />
+        <Tickets ticketing={ticketing} />
         <Location />
         <Faq />
       </main>
@@ -375,12 +379,16 @@ function Journey() {
 }
 
 /* 05 — PROGRAMMING */
-function Programming() {
+function Programming({ ticketing }: { ticketing: PublicTicketing }) {
   const { programs } = useSiteContent();
   const [selected, setSelected] = useState(
     (programs[2] ?? programs[0])!.dayIndex,
   );
   const p = programs.find((x) => x.dayIndex === selected) ?? programs[0]!;
+  const hasPublishedSession = ticketing.dates.some((day) => {
+    const dayIndex = new Date(`${day.date}T12:00:00`).getDay();
+    return (dayIndex === 0 ? 7 : dayIndex) === selected && day.slots.length > 0;
+  });
 
   return (
     <section
@@ -443,11 +451,7 @@ function Programming() {
                   Disponibilité
                 </dt>
                 <dd className="mt-1 font-semibold">
-                  {p.status === "LOW_AVAILABILITY"
-                    ? "Peu de disponibilités"
-                    : p.status === "SOLD_OUT"
-                      ? "Complet"
-                      : "Billets disponibles"}
+                  {hasPublishedSession ? "Séances annoncées — vente à venir" : "Dates à annoncer"}
                 </dd>
               </div>
             </dl>
@@ -457,7 +461,7 @@ function Programming() {
               search={{ theme: p.title }}
               className="mt-8 inline-block rounded-full bg-primary px-8 py-4 text-xs font-bold uppercase tracking-[0.18em] text-primary-foreground"
             >
-              Choisir cette soirée
+              Voir les séances annoncées
             </Link>
           </div>
         </div>
@@ -705,8 +709,8 @@ function Practical() {
 }
 
 /* 10 — TICKETS */
-function Tickets() {
-  const visible = ticketTypes.filter((t) =>
+function Tickets({ ticketing }: { ticketing: PublicTicketing }) {
+  const visible = ticketing.ticketTypes.filter((t) =>
     ["GENERAL", "SENIOR", "CHILD", "FAMILY", "TODDLER"].includes(t.code),
   );
   return (
@@ -716,6 +720,11 @@ function Tickets() {
         <h2 className="mt-4 text-[clamp(2rem,6vw,3.5rem)]">
           Des tarifs <span className="text-ice">clairs.</span>
         </h2>
+        {visible.length === 0 && (
+          <p className="mt-8 rounded-xl border border-border p-5 text-sm text-muted-foreground">
+            Les tarifs officiels ne sont pas encore publiés pour la saison active.
+          </p>
+        )}
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {visible.map((t) => (
             <li key={t.id} className="rounded-2xl border border-border/60 bg-card p-6">
@@ -730,14 +739,15 @@ function Tickets() {
           ))}
         </ul>
         <p className="mt-6 text-sm text-muted-foreground">
-          Billet ouvert et tarif de groupe (15 personnes et plus) offerts à la
-          billetterie. Taxes en sus, affichées avant le paiement.
+          Les tarifs présentés proviennent du catalogue de la saison active.
+          Les montants sont indicatifs, taxes en sus. La vente en ligne et la
+          réservation seront activées après validation technique.
         </p>
         <Link
           to="/billets"
           className="mt-8 inline-block rounded-full bg-primary px-10 py-4 text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground glow"
         >
-          Choisir mes billets
+          Consulter la billetterie
         </Link>
       </div>
     </section>
