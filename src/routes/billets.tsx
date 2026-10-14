@@ -82,7 +82,7 @@ function BilletsPage() {
   const [slot, setSlot] = useState<string | undefined>(undefined);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [flex, setFlex] = useState(false);
-  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(search.date ? 2 : 1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(search.date ? 2 : 1);
 
   const selectedDay = inventory.dates.find((d) => d.date === dateKey);
   const selectedDate = selectedDay ? new Date(`${selectedDay.date}T12:00:00`) : undefined;
@@ -93,7 +93,7 @@ function BilletsPage() {
       ticketTypes
         .filter((t) => (quantities[t.id] ?? 0) > 0)
         .map((t) => ({ type: t, qty: quantities[t.id] ?? 0 })),
-    [quantities],
+    [quantities, ticketTypes],
   );
 
   const totalTickets = lines.reduce((n, l) => n + l.qty, 0);
@@ -108,7 +108,7 @@ function BilletsPage() {
 
   // Server-side rules mirrored client-side (never trusted alone).
   const errors: string[] = [];
-  const familyQty = quantities["tt-family"] ?? 0;
+  const familyQty = quantities["FAMILY"] ?? 0;
   if (familyQty > 0 && familyQty < 3)
     errors.push("La passe familiale exige un minimum de 3 billets.");
   if (familyQty > 6)
@@ -118,7 +118,7 @@ function BilletsPage() {
     .reduce((n, t) => n + (quantities[t.id] ?? 0), 0);
   if (familyQty > 0 && adultsWithFamily > 2)
     errors.push("La passe familiale permet un maximum de 2 adultes.");
-  const groupQty = quantities["tt-group"] ?? 0;
+  const groupQty = quantities["GROUP"] ?? 0;
   if (groupQty > 0 && groupQty < 15)
     errors.push("Le tarif de groupe s'applique à partir de 15 personnes.");
 
@@ -207,7 +207,6 @@ function BilletsPage() {
             <div className="mt-2 grid grid-cols-7 gap-1">
               {days.map((d, i) => {
                 if (!d) return <span key={i} />;
-                const p = programForDate(d);
                 const key = toKey(d);
                 const past = d < new Date(new Date().toDateString());
                 const published = inventory.dates.find((item) => item.date === key);
@@ -218,7 +217,7 @@ function BilletsPage() {
                     key={key}
                     type="button"
                     disabled={disabled}
-                    aria-label={`${d.getDate()} ${MONTHS[d.getMonth()]}${p ? ` — ${p.title}` : " — fermé"}`}
+                    aria-label={`${d.getDate()} ${MONTHS[d.getMonth()]} — ${disabled ? "séance non publiée" : "séance publiée"}`}
                     onClick={() => {
                       setDateKey(key);
                       setSlot(undefined);
@@ -320,7 +319,8 @@ function BilletsPage() {
                           type="button"
                           aria-label={`Ajouter un billet ${t.nameFr}`}
                           onClick={() => setQty(t.id, 1)}
-                          className="grid h-9 w-9 place-items-center rounded-full border border-primary/60 text-primary"
+                          disabled={(quantities[t.id] ?? 0) >= t.maximumQuantity}
+                          className="grid h-9 w-9 place-items-center rounded-full border border-primary/60 text-primary disabled:opacity-30"
                         >
                           <Plus size={15} />
                         </button>
