@@ -364,11 +364,11 @@ export const faq: FaqGroup[] = [
     items: [
       {
         q: "Où acheter mes billets ?",
-        a: "Directement sur festi-ice.ca. Vous choisissez la date, la séance d'arrivée et vos billets, puis vous recevez vos billets QR par courriel.",
+        a: "La vente en ligne ouvrira dès l’activation officielle de la billetterie sécurisée. Pour le moment, les dates publiées et le catalogue de tarifs servent à préparer votre visite; aucune commande n’est encaissée.",
       },
       {
         q: "Dois-je imprimer mon billet ?",
-        a: "Non. Le code QR reçu par courriel est suffisant, directement sur votre téléphone.",
+        a: "Lorsque la billetterie sécurisée et l’émission des billets QR seront activées, les modalités de présentation à l’entrée seront précisées sur votre confirmation officielle.",
       },
       {
         q: "Les bambins de moins de 2 ans sont-ils gratuits ?",
