@@ -230,3 +230,27 @@ export async function deliverOrderTickets(orderId: string): Promise<void> {
     .eq("id", orderId).eq("status", "PAID");
   if (updateError) throw new Error("Email delivery receipt not persisted");
 }
+
+
+/** One privileged query for publicly published sessions; no customer data. */
+export async function getPublishedRemainingCapacity(): Promise<Map<string, number>> {
+  const env = process.env;
+  const ref = env["FESTIICE_APPROVED_SUPABASE_PROJECT_REF"];
+  if (!ref || env["SUPABASE_URL"] !== "https://" + ref + ".supabase.co" ||
+    !env["SUPABASE_SERVICE_ROLE_KEY"]) return new Map();
+  try {
+    const { data, error } = await database().rpc("published_slot_capacity");
+    if (error || !Array.isArray(data)) {
+      console.error("[ticketing] capacity query unavailable", error?.code);
+      return new Map();
+    }
+    const result = new Map<string, number>();
+    for (const row of data) {
+      if (row && typeof row.slot_id === "string" && Number.isSafeInteger(row.remaining))
+        result.set(row.slot_id, Math.max(0,row.remaining));
+    }
+    return result;
+  } catch {
+    return new Map();
+  }
+}

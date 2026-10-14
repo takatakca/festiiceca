@@ -12,7 +12,7 @@ import type { Database } from "@/integrations/supabase/types";
 import type { TicketType } from "@/lib/festi-data";
 
 export type PublicTicketing = {
-  dates: { date: string; slots: { id: string; startTime: string }[] }[];
+  dates: { date: string; slots: { id: string; startTime: string; remaining: number }[] }[];
   ticketTypes: TicketType[];
   flexOption: { nameFr: string; descriptionFr: string; priceCents: number } | null;
   checkoutEnabled: boolean;
@@ -95,17 +95,20 @@ export const getPublicTicketing = createServerFn({ method: "GET" }).handler(
       }
 
       const prices = priceResult.data ?? [];
-      // Security: evaluate only on the server; never expose private configuration.
-      const { paymentConfigured } = await import("@/lib/checkout.server");
+      // Capacity must be read by the trusted server. An unavailable capacity
+      // service fails CLOSED rather than pretending every published slot has seats.
+      const { paymentConfigured, getPublishedRemainingCapacity } = await import("@/lib/checkout.server");
+      const capacity = await getPublishedRemainingCapacity();
       const flex = prices.find((p) => p.code === "FLEX_WEATHER" && p.is_addon);
       return {
         checkoutEnabled: paymentConfigured() && eventDates.some((date) =>
-          (slotResult?.data ?? []).some((slot) => slot.event_date_id === date.id)),
+          (slotResult?.data ?? []).some((slot) => slot.event_date_id === date.id &&
+            (capacity.get(slot.id) ?? 0) > 0)),
         dates: eventDates.map((d) => ({
           date: d.event_date,
           slots: (slotResult?.data ?? [])
-            .filter((slot) => slot.event_date_id === d.id)
-            .map((slot) => ({ id: slot.id, startTime: slot.start_time })),
+            .filter((slot) => slot.event_date_id === d.id && (capacity.get(slot.id) ?? 0) > 0)
+            .map((slot) => ({ id: slot.id, startTime: slot.start_time, remaining: capacity.get(slot.id)! })),
         })),
         ticketTypes: prices.filter((p) => !p.is_addon).map((p) => ({
           id: p.code,

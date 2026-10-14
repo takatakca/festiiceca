@@ -177,3 +177,26 @@ REVOKE EXECUTE ON FUNCTION public.cancel_checkout_order(uuid,text) FROM PUBLIC,a
 GRANT EXECUTE ON FUNCTION public.create_checkout_order(uuid,jsonb,boolean,text,text,text,integer) TO service_role;
 GRANT EXECUTE ON FUNCTION public.finalize_checkout_order(uuid,text,text,text,integer) TO service_role;
 GRANT EXECUTE ON FUNCTION public.cancel_checkout_order(uuid,text) TO service_role;
+
+
+-- Server-only bulk capacity read for published, non-test, OPEN sessions.
+-- This avoids exposing SECURITY DEFINER slot_remaining_capacity to anon.
+CREATE OR REPLACE FUNCTION public.published_slot_capacity()
+RETURNS TABLE(slot_id uuid, remaining integer)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = ''
+AS $func$
+ SELECT s.id,
+  GREATEST(0, s.capacity
+    - COALESCE((SELECT sum(h.quantity) FROM public.holds h
+        WHERE h.time_slot_id = s.id AND h.status = 'ACTIVE' AND h.expires_at > now()),0)
+    - COALESCE((SELECT count(*) FROM public.tickets t
+        WHERE t.time_slot_id = s.id AND t.status IN ('VALID','USED')),0))::integer
+ FROM public.time_slots s
+ JOIN public.event_dates d ON d.id = s.event_date_id
+ JOIN public.seasons season ON season.id = d.season_id
+ WHERE s.published AND s.status = 'OPEN' AND d.published AND NOT d.is_test
+   AND d.status = 'OPEN' AND season.is_active AND season.status = 'ACTIVE'
+   AND d.event_date >= (now() AT TIME ZONE 'America/Toronto')::date;
+$func$;
+REVOKE EXECUTE ON FUNCTION public.published_slot_capacity() FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.published_slot_capacity() TO service_role;

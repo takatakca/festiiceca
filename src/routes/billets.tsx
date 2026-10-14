@@ -132,6 +132,9 @@ function BilletsPage() {
   if (familyQty > 0 && familyAdults + adultsWithFamily > 2)
     errors.push("La passe familiale ne peut comporter plus de 2 adultes au total.");
 
+  const selectedCapacity = selectedDay?.slots.find((entry) => entry.startTime.slice(0, 5) === slot)?.remaining;
+  if (selectedCapacity !== undefined && totalTickets > selectedCapacity)
+    errors.push("Le nombre de billets dépasse les places restantes pour cette séance.");
   const canContinueTickets = totalTickets > 0 && errors.length === 0;
 
   const setQty = (id: string, delta: number) =>
@@ -296,7 +299,7 @@ function BilletsPage() {
               <span className="flex items-center gap-2">
                 <i className="inline-block h-1.5 w-1.5 rounded-full bg-primary" /> Séance annoncée
               </span>
-              <span className="text-muted-foreground/60">Grisé — séance non publiée</span>
+              <span className="text-muted-foreground/60">Grisé — fermée, complète ou non publiée</span>
             </p>
           </Panel>
 
@@ -327,7 +330,7 @@ function BilletsPage() {
                         : "border-border/70 hover:border-primary/70"
                     }`}
                   >
-                    {t.startTime.slice(0, 5)}
+                    {t.startTime.slice(0, 5)} <span className="block text-[0.6rem] font-normal">{t.remaining} places</span>
                   </button>
                 ))}
               </div>
