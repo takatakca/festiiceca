@@ -1,6 +1,7 @@
 -- FESTI-ICE 2026: production checkout RPCs. Apply only to verified project.
 -- All three functions are deliberately callable by service_role only.
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS stripe_checkout_session_id text UNIQUE;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS tickets_emailed_at timestamptz;
 
 CREATE OR REPLACE FUNCTION public.create_checkout_order(
  _slot_id uuid, _items jsonb, _flex boolean,

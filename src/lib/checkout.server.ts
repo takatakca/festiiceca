@@ -3,6 +3,7 @@
  * Sales are closed unless all opt-in runtime settings and approved DB match.
  */
 import { createClient } from "@supabase/supabase-js";
+import QRCode from "qrcode";
 
 type Cart = {
   slotId: string;
@@ -27,7 +28,9 @@ export function paymentConfigured(): boolean {
     env["SUPABASE_URL"] === "https://" + ref + ".supabase.co" &&
     !!env["SUPABASE_SERVICE_ROLE_KEY"] &&
     !!env["SUPABASE_PUBLISHABLE_KEY"] &&
-    !!env["STRIPE_SECRET_KEY"] && !!env["STRIPE_WEBHOOK_SECRET"];
+    !!env["STRIPE_SECRET_KEY"] && !!env["STRIPE_WEBHOOK_SECRET"] &&
+    !!env["RESEND_API_KEY"] && !!env["FESTIICE_TICKET_FROM_EMAIL"] &&
+    /^[^\s@]+@[^\s@]+$/.test(env["FESTIICE_TICKET_FROM_EMAIL"]);
 }
 
 function database() {
@@ -166,4 +169,64 @@ export async function settleCheckout(
     console.error("[checkout] fulfillment failed", error.code);
     throw new Error("Fulfillment failed");
   }
+}
+
+
+/** Email only issued QR tickets. Webhook retries recover a failed send. */
+export async function deliverOrderTickets(orderId: string): Promise<void> {
+  if (!paymentConfigured()) throw new Error("Ticket email not configured");
+  const db = database();
+  const { data: order, error: orderError } = await db.from("orders")
+    .select("order_number,customer_email,status,tickets_emailed_at")
+    .eq("id", orderId).maybeSingle();
+  if (orderError || !order || order.status !== "PAID") throw new Error("Order not paid");
+  if (order.tickets_emailed_at) return;
+  const { data: tickets, error: ticketError } = await db.from("tickets")
+    .select("id,qr_token,name_snapshot,ticket_type_code")
+    .eq("order_id", orderId).order("id");
+  if (ticketError || !tickets || tickets.length === 0) throw new Error("Missing tickets");
+
+  const escaped = (raw: string) => raw.replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[ch] ?? ch));
+  const attachments: { filename: string; content: string }[] = [];
+  const rows: string[] = [];
+  for (const [index,ticket] of tickets.entries()) {
+    const encoded = await QRCode.toDataURL(ticket.qr_token, { width: 320, margin: 2 });
+    const base64 = encoded.split(",")[1];
+    if (!base64) throw new Error("QR rendering failed");
+    const filename = "festiice-billet-" + (index+1) + ".png";
+    attachments.push({ filename, content: base64 });
+    rows.push("<li>" + escaped(ticket.name_snapshot) + " — QR en pièce jointe " +
+      String(index + 1) + "<br/><code>" + escaped(ticket.qr_token) + "</code></li>");
+  }
+  const html = "<html><body><h1>Vos billets FESTI-ICE</h1>" +
+    "<p>Votre paiement est confirmé. Numéro de commande : <strong>" +
+    escaped(order.order_number) + "</strong>.</p>" +
+    "<p>Présentez chaque code QR à l'entrée (une seule entrée par billet). " +
+    "Gardez ces codes confidentiels.</p><ol>" + rows.join("") + "</ol>" +
+    "<p>Renseignements : info@festi-ice.ca</p></body></html>";
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + process.env["RESEND_API_KEY"]!,
+      "Content-Type": "application/json",
+      "Idempotency-Key": "festiice-tickets-" + orderId,
+    },
+    body: JSON.stringify({
+      from: process.env["FESTIICE_TICKET_FROM_EMAIL"],
+      to: [order.customer_email],
+      subject: "Vos billets FESTI-ICE — " + order.order_number,
+      html, attachments,
+    }),
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) {
+    console.error("[checkout] email delivery rejected", response.status);
+    throw new Error("Ticket delivery failed");
+  }
+  const { error: updateError } = await db.from("orders")
+    .update({ tickets_emailed_at: new Date().toISOString() })
+    .eq("id", orderId).eq("status", "PAID");
+  if (updateError) throw new Error("Email delivery receipt not persisted");
 }
