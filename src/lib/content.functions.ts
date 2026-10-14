@@ -37,8 +37,19 @@ function splitSubtitle(subtitle: string | null): {
 
 export const getSiteContent = createServerFn({ method: "GET" }).handler(
   async (): Promise<SiteContent> => {
-    const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-    const url = process.env["SUPABASE_URL"]!;
+    const empty: SiteContent = {
+      season: null,
+      status: null,
+      routeSegments: [],
+      programs: [],
+      faq: [],
+      accommodations: [],
+    };
+
+    const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
+    const url = process.env["SUPABASE_URL"];
+    if (!key || !url) return empty;
+
     const supabase = createClient<Database>(url, key, {
       auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
       global: {
@@ -52,15 +63,6 @@ export const getSiteContent = createServerFn({ method: "GET" }).handler(
         },
       },
     });
-
-    const empty: SiteContent = {
-      season: null,
-      status: null,
-      routeSegments: [],
-      programs: [],
-      faq: [],
-      accommodations: [],
-    };
 
     try {
       const [seasonRes, segRes, progRes, faqRes, accRes, statusRes] = await Promise.all([
