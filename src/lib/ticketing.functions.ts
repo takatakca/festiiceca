@@ -15,9 +15,10 @@ export type PublicTicketing = {
   dates: { date: string; slots: { id: string; startTime: string }[] }[];
   ticketTypes: TicketType[];
   flexOption: { nameFr: string; descriptionFr: string; priceCents: number } | null;
+  checkoutEnabled: boolean;
 };
 
-const EMPTY: PublicTicketing = { dates: [], ticketTypes: [], flexOption: null };
+const EMPTY: PublicTicketing = { dates: [], ticketTypes: [], flexOption: null, checkoutEnabled: false };
 
 export const getPublicTicketing = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicTicketing> => {
@@ -94,8 +95,12 @@ export const getPublicTicketing = createServerFn({ method: "GET" }).handler(
       }
 
       const prices = priceResult.data ?? [];
+      // Security: evaluate only on the server; never expose private configuration.
+      const { paymentConfigured } = await import("@/lib/checkout.server");
       const flex = prices.find((p) => p.code === "FLEX_WEATHER" && p.is_addon);
       return {
+        checkoutEnabled: paymentConfigured() && eventDates.some((date) =>
+          (slotResult?.data ?? []).some((slot) => slot.event_date_id === date.id)),
         dates: eventDates.map((d) => ({
           date: d.event_date,
           slots: (slotResult?.data ?? [])
