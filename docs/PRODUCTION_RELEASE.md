@@ -39,3 +39,29 @@ Never upload only `.output/public` as a complete deployment.
    before calling the system production ready.
 
 Do not add a fake payment success page or demo ticket confirmation.
+
+## Optional self-hosted deployment (Coolify / Contabo)
+
+A multi-stage Dockerfile is provided at `Dockerfile.coolify`.
+It runs the same Node/Nitro SSR output as `npm run build`, listening
+on port `8080` (environment: `PORT=8080`, `HOST=0.0.0.0`).
+It does **not** switch DNS or auto-deploy by itself.
+
+- Create a separate Coolify service from this GitHub repository using
+  Dockerfile build mode, `Dockerfile.coolify`, and internal port `8080`.
+- Connect and verify the chosen domain after confirming whether it is
+  `festiice.ca` or `festi-ice.ca`, and keep the current site operational
+  until HTTPS + public paths have been checked.
+- In Coolify's protected runtime variables set `SUPABASE_URL` and
+  `SUPABASE_PUBLISHABLE_KEY` for the **correct** backend, never expose
+  `SUPABASE_SERVICE_ROLE_KEY` to the public environment.
+- Use Coolify GitHub push webhook for automatic deployment from `main`
+  after building a verified first revision; keep rollback available.
+- Confirm `/` and `/billets` return real HTML over HTTPS before switching DNS.
+
+**Important:** `supabase/config.toml` points at Supabase project
+`xsozkxcnjmyjjaorkxlx`, which is **not** the same as the connected
+Supabase project named FESTI ICE (`anyiaszbjsyrxfgjbwdt`). The latter
+was restored on 2026-10-14 and was empty (zero public tables) after
+restoration. Do not apply migrations to it or assign its URL as this
+application's production backend without confirming ownership and intent.

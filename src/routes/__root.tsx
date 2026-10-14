@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Le plus grand événement de glace au Canada prend vie au Camping Havana Resort, à Maricourt.",
+          "Découvrez le parcours de patinage illuminé FESTI-ICE au Havana Resort, à Maricourt.",
       },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "fr_CA" },

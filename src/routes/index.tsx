@@ -43,7 +43,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Le plus grand événement de glace au Canada transforme le Camping Havana Resort en parcours illuminé, animé par la musique, les kiosques et l'hiver québécois.",
+          "FESTI-ICE invite les visiteurs à découvrir le Havana Resort en hiver : patinage illuminé, musique et ambiance familiale.",
       },
       { property: "og:title", content: "FESTI-ICE — Patinez dans la lumière" },
       {

@@ -1,0 +1,13 @@
+.git
+.github
+node_modules
+.output
+dist
+*.log
+*.tar.gz
+.env
+.env.*
+!.env.example
+coverage
+.vscode
+.idea

@@ -243,7 +243,7 @@ function BilletsPage() {
             </div>
             <p className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-2">
-                <i className="inline-block h-1.5 w-1.5 rounded-full bg-primary" /> Disponible
+                <i className="inline-block h-1.5 w-1.5 rounded-full bg-primary" /> Séance annoncée
               </span>
               <span className="text-muted-foreground/60">Grisé — séance non publiée</span>
             </p>
