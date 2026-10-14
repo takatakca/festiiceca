@@ -28,6 +28,6 @@ jobs:
       # Existing repository has >1,400 legacy Prettier discrepancies.
       # Keep semantic ESLint rules enforced; normalize formatting separately.
       - name: Lint (semantic rules)
-        run: npx eslint . --rule 'prettier/prettier: off'
+        run: "npx eslint . --rule 'prettier/prettier: off'"
       - name: Build server
         run: npm run build
