@@ -2,25 +2,23 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
-  Check,
   Minus,
   Plus,
   ShieldCheck,
   Ticket,
 } from "lucide-react";
 import {
-  flexOption,
   formatCents,
   programs,
   taxes,
-  ticketTypes,
-  timeSlots,
-  venue,
+  support,
 } from "@/lib/festi-data";
+import { getPublicTicketing } from "@/lib/ticketing.functions";
 
 type Search = { date?: string | undefined; theme?: string | undefined };
 
 export const Route = createFileRoute("/billets")({
+  loader: () => getPublicTicketing(),
   validateSearch: (search: Record<string, unknown>): Search => ({
     date: typeof search["date"] === "string" ? search["date"] : undefined,
     theme: typeof search["theme"] === "string" ? search["theme"] : undefined,
@@ -37,7 +35,7 @@ export const Route = createFileRoute("/billets")({
       {
         property: "og:description",
         content:
-          "Calendrier, séances d'arrivée, tarifs familiaux et Option Flex Météo. Achat en ligne sécurisé.",
+          "Consultez les séances publiées et les tarifs de FESTI-ICE. La vente en ligne sera activée après validation du paiement.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -77,16 +75,17 @@ function programForDate(d: Date) {
 
 function BilletsPage() {
   const search = Route.useSearch();
+  const inventory = Route.useLoaderData();
+  const ticketTypes = inventory.ticketTypes;
   const [cursor, setCursor] = useState(() => new Date());
   const [dateKey, setDateKey] = useState<string | undefined>(search.date);
   const [slot, setSlot] = useState<string | undefined>(undefined);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [flex, setFlex] = useState(false);
-  const [promo, setPromo] = useState("");
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(search.date ? 2 : 1);
-  const [placed, setPlaced] = useState(false);
 
-  const selectedDate = dateKey ? new Date(`${dateKey}T12:00:00`) : undefined;
+  const selectedDay = inventory.dates.find((d) => d.date === dateKey);
+  const selectedDate = selectedDay ? new Date(`${selectedDay.date}T12:00:00`) : undefined;
   const program = selectedDate ? programForDate(selectedDate) : undefined;
 
   const lines = useMemo(
@@ -99,7 +98,7 @@ function BilletsPage() {
 
   const totalTickets = lines.reduce((n, l) => n + l.qty, 0);
   const subtotal = lines.reduce((n, l) => n + l.qty * l.type.priceCents, 0);
-  const flexTotal = flex ? totalTickets * flexOption.priceCents : 0;
+  const flexTotal = flex && inventory.flexOption ? totalTickets * inventory.flexOption.priceCents : 0;
   const taxable = subtotal + flexTotal;
   const taxLines = taxes.map((t) => ({
     code: t.code,
@@ -142,10 +141,6 @@ function BilletsPage() {
     return cells;
   }, [cursor]);
 
-  if (placed) {
-    return <Success date={selectedDate} slot={slot} tickets={totalTickets} total={total} program={program?.title} />;
-  }
-
   return (
     <main className="mx-auto max-w-6xl px-4 pb-40 pt-28 sm:px-6 lg:pt-32">
       <a
@@ -159,11 +154,20 @@ function BilletsPage() {
         Vos billets <span className="text-ice">FESTI-ICE</span>
       </h1>
       <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-        Date, séance d'arrivée, billets, paiement. Quatre étapes, aucun frais
-        surprise.
+        Consultez les séances publiées et estimez votre panier. Aucun paiement
+        ni aucune réservation ne sont effectués sur cette page pour le moment.
       </p>
 
       <Steps step={step} />
+
+      <p role="status" className="mt-5 rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm">
+        La billetterie est en préparation. Seules les dates et les catégories configurées dans le système officiel sont affichées; aucun paiement ne sera accepté tant que le parcours sécurisé n’est pas activé.
+      </p>
+      {inventory.dates.length === 0 && (
+        <p role="status" className="mt-4 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+          Aucune date de vente n’est encore publiée. Consultez cette page ultérieurement pour les annonces officielles.
+        </p>
+      )}
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-8">
@@ -206,7 +210,8 @@ function BilletsPage() {
                 const p = programForDate(d);
                 const key = toKey(d);
                 const past = d < new Date(new Date().toDateString());
-                const disabled = !p || past || p.status === "SOLD_OUT";
+                const published = inventory.dates.find((item) => item.date === key);
+                const disabled = past || !published || published.slots.length === 0;
                 const selected = key === dateKey;
                 return (
                   <button
@@ -230,9 +235,7 @@ function BilletsPage() {
                     <span className="block leading-none">{d.getDate()}</span>
                     {!disabled && !selected && (
                       <span
-                        className={`mx-auto mt-1 block h-1 w-1 rounded-full ${
-                          p?.status === "LOW_AVAILABILITY" ? "bg-coral" : "bg-primary"
-                        }`}
+                        className="mx-auto mt-1 block h-1 w-1 rounded-full bg-primary"
                       />
                     )}
                   </button>
@@ -243,11 +246,7 @@ function BilletsPage() {
               <span className="flex items-center gap-2">
                 <i className="inline-block h-1.5 w-1.5 rounded-full bg-primary" /> Disponible
               </span>
-              <span className="flex items-center gap-2">
-                <i className="inline-block h-1.5 w-1.5 rounded-full bg-coral" /> Peu de
-                disponibilités
-              </span>
-              <span className="text-muted-foreground/60">Grisé — fermé ou complet</span>
+              <span className="text-muted-foreground/60">Grisé — séance non publiée</span>
             </p>
           </Panel>
 
@@ -256,7 +255,7 @@ function BilletsPage() {
             <Panel active n="02" title="Choisir votre heure d'arrivée">
               {program && (
                 <div className="mb-5 rounded-xl border border-primary/25 bg-primary/5 p-4">
-                  <p className="eyebrow">{program.dayLongFr} · {program.styles}</p>
+                  <p className="eyebrow">Programmation indicative · {program.dayLongFr} · {program.styles}</p>
                   <p className="font-display text-xl">{program.title}</p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {program.startTime} – {program.endTime} · {program.note}
@@ -264,21 +263,21 @@ function BilletsPage() {
                 </div>
               )}
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-                {timeSlots.map((t) => (
+                {(selectedDay?.slots ?? []).map((t) => (
                   <button
-                    key={t}
+                    key={t.id}
                     type="button"
                     onClick={() => {
-                      setSlot(t);
+                      setSlot(t.startTime.slice(0, 5));
                       setStep(3);
                     }}
                     className={`rounded-full border py-2.5 text-sm font-semibold transition-colors ${
-                      slot === t
+                      slot === t.startTime.slice(0, 5)
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border/70 hover:border-primary/70"
                     }`}
                   >
-                    {t}
+                    {t.startTime.slice(0, 5)}
                   </button>
                 ))}
               </div>
@@ -288,6 +287,7 @@ function BilletsPage() {
           {/* STEP 3 — TICKETS */}
           {step >= 3 && slot && (
             <Panel active n="03" title="Choisir vos billets">
+              {ticketTypes.length === 0 && <p className="text-sm text-muted-foreground">Aucune catégorie de billets publiée.</p>}
               <ul className="divide-y divide-border/50">
                 {ticketTypes
                   .filter((t) => t.active)
@@ -340,7 +340,7 @@ function BilletsPage() {
                 </ul>
               )}
 
-              <div className="mt-6 rounded-xl border border-aurora/30 bg-aurora/5 p-4">
+              {inventory.flexOption && <div className="mt-6 rounded-xl border border-aurora/30 bg-aurora/5 p-4">
                 <label className="flex cursor-pointer items-start gap-3">
                   <input
                     type="checkbox"
@@ -350,14 +350,14 @@ function BilletsPage() {
                   />
                   <span>
                     <span className="text-sm font-semibold">
-                      {flexOption.nameFr} — {formatCents(flexOption.priceCents)} / billet
+                      {inventory.flexOption.nameFr} — {formatCents(inventory.flexOption.priceCents)} / billet
                     </span>
                     <span className="mt-1 block text-xs text-muted-foreground">
-                      {flexOption.descriptionFr}
+                      {inventory.flexOption.descriptionFr}
                     </span>
                   </span>
                 </label>
-              </div>
+              </div>}
 
               <button
                 type="button"
@@ -370,79 +370,25 @@ function BilletsPage() {
             </Panel>
           )}
 
-          {/* STEP 4 — DETAILS */}
+          {/* STEP 4 — SALES NOT YET ACTIVATED */}
           {step >= 4 && (
-            <Panel active n="04" title="Vos informations">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Prénom" name="firstName" />
-                <Field label="Nom" name="lastName" />
-                <Field label="Courriel" name="email" type="email" />
-                <Field label="Téléphone" name="phone" type="tel" />
-                <Field label="Code postal" name="postal" />
-                <div>
-                  <label
-                    htmlFor="lang"
-                    className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
-                  >
-                    Langue des communications
-                  </label>
-                  <select
-                    id="lang"
-                    className="w-full rounded-lg border border-input bg-card px-3 py-3 text-sm"
-                  >
-                    <option>Français</option>
-                    <option>English</option>
-                  </select>
-                </div>
-              </div>
-              <label className="mt-5 flex items-start gap-3 text-xs text-muted-foreground">
-                <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[var(--cyan-ice)]" />
-                Je souhaite recevoir les nouvelles et offres FESTI-ICE. (facultatif)
-              </label>
-              <button
-                type="button"
-                onClick={() => setStep(5)}
-                className="mt-6 w-full rounded-full bg-primary py-4 text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground"
-              >
-                Aller au paiement
-              </button>
-            </Panel>
-          )}
-
-          {/* STEP 5 — PAYMENT */}
-          {step >= 5 && (
-            <Panel active n="05" title="Paiement">
-              <div className="rounded-xl border border-dashed border-border p-6 text-center">
-                <ShieldCheck className="mx-auto mb-3 text-primary" />
-                <p className="text-sm font-semibold">Paiement sécurisé</p>
-                <p className="mx-auto mt-2 max-w-sm text-xs text-muted-foreground">
-                  Le module de paiement (carte, Apple&nbsp;Pay, Google&nbsp;Pay) est
-                  branché à la prochaine phase, avec vérification serveur et émission
-                  des billets QR.
+            <Panel active n="04" title="Préparer votre visite">
+              <div className="rounded-xl border border-primary/30 bg-primary/5 p-6">
+                <ShieldCheck className="mb-3 text-primary" aria-hidden />
+                <h3 className="text-lg font-semibold">Aucun paiement n’est effectué</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  Ceci est une estimation seulement. Votre date et vos billets ne sont
+                  pas réservés. La vente sera ouverte après activation de la
+                  plateforme de paiement, de la validation des capacités et de
+                  l’émission des billets QR.
                 </p>
-              </div>
-              <div className="mt-5">
-                <label
-                  htmlFor="promo"
-                  className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                <a
+                  href={`mailto:${support.festiIce.email}?subject=Billetterie%20FESTI-ICE`}
+                  className="mt-5 inline-flex rounded-full border border-primary/60 px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-primary"
                 >
-                  Code promotionnel
-                </label>
-                <input
-                  id="promo"
-                  value={promo}
-                  onChange={(e) => setPromo(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-input bg-card px-3 py-3 text-sm"
-                  placeholder="Facultatif"
-                />
+                  Contacter l’équipe FESTI-ICE
+                </a>
               </div>
-              <button
-                type="button"
-                onClick={() => setPlaced(true)}
-                className="mt-6 w-full rounded-full bg-primary py-4 text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground glow"
-              >
-                Payer {formatCents(total)}
-              </button>
             </Panel>
           )}
         </div>
@@ -485,7 +431,7 @@ function BilletsPage() {
                 ))}
                 <div className="my-3 h-px bg-border/60" />
                 <div className="flex items-baseline justify-between">
-                  <span className="font-display text-lg">Total</span>
+                  <span className="font-display text-lg">Estimation</span>
                   <span className="font-display text-lg text-ice">
                     {formatCents(total)}
                   </span>
@@ -494,7 +440,7 @@ function BilletsPage() {
             )}
             <p className="mt-4 flex items-start gap-2 text-xs text-muted-foreground">
               <Ticket size={14} className="mt-0.5 shrink-0" />
-              Aucuns frais cachés. Les taxes applicables sont affichées ci-dessus.
+              Montants indicatifs, taxes estimées. Aucune commande ni aucun paiement enregistré.
             </p>
           </div>
         </aside>
@@ -504,7 +450,7 @@ function BilletsPage() {
 }
 
 function Steps({ step }: { step: number }) {
-  const labels = ["Date", "Heure", "Billets", "Infos", "Paiement"];
+  const labels = ["Date", "Heure", "Billets", "Information"];
   return (
     <ol className="mt-8 flex flex-wrap gap-2 text-[0.65rem] uppercase tracking-[0.16em]">
       {labels.map((l, i) => (
@@ -571,82 +517,3 @@ function Row({
   );
 }
 
-function Field({
-  label,
-  name,
-  type = "text",
-}: {
-  label: string;
-  name: string;
-  type?: string;
-}) {
-  return (
-    <div>
-      <label
-        htmlFor={name}
-        className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
-      >
-        {label}
-      </label>
-      <input
-        id={name}
-        name={name}
-        type={type}
-        className="w-full rounded-lg border border-input bg-card px-3 py-3 text-sm"
-      />
-    </div>
-  );
-}
-
-function Success({
-  date,
-  slot,
-  tickets,
-  total,
-  program,
-}: {
-  date?: Date | undefined;
-  slot?: string | undefined;
-  tickets: number;
-  total: number;
-  program?: string | undefined;
-}) {
-  return (
-    <main className="mx-auto max-w-2xl px-4 pb-32 pt-32 text-center sm:px-6">
-      <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground glow">
-        <Check size={30} />
-      </div>
-      <h1 className="mt-8 text-4xl sm:text-5xl">À bientôt sur la glace.</h1>
-      <p className="mt-4 text-sm text-muted-foreground">
-        Votre commande est enregistrée. Les billets QR seront transmis par courriel
-        dès l'activation du module de paiement.
-      </p>
-      <dl className="surface-frost mt-8 space-y-3 rounded-2xl p-6 text-left text-sm">
-        <Row
-          label="Date"
-          value={date ? `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}` : "—"}
-        />
-        <Row label="Séance d'arrivée" value={slot ?? "—"} />
-        <Row label="Ambiance de la soirée" value={program ?? "—"} />
-        <Row label="Billets" value={String(tickets)} />
-        <Row label="Total payé" value={formatCents(total)} />
-      </dl>
-      <div className="mt-8 flex flex-wrap justify-center gap-3">
-        <a
-          href={venue.directionsUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="rounded-full border border-primary/60 px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-primary"
-        >
-          Itinéraire
-        </a>
-        <a
-          href="/"
-          className="rounded-full bg-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-primary-foreground"
-        >
-          Préparer ma visite
-        </a>
-      </div>
-    </main>
-  );
-}
