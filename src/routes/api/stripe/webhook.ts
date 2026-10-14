@@ -55,13 +55,17 @@ export const Route = createFileRoute("/api/stripe/webhook")({
             return new Response("Invalid checkout session", { status: 400 });
           if (kind === "paid" && obj.payment_status !== "paid")
             return Response.json({ received: true });
-          const { settleCheckout } = await import("@/lib/checkout.server");
+          const { settleCheckout, deliverOrderTickets } = await import("@/lib/checkout.server");
           await settleCheckout(kind, {
             id: obj.id, client_reference_id: obj.client_reference_id,
             metadata: obj.metadata, payment_intent: obj.payment_intent,
             amount_total: obj.amount_total, currency: obj.currency,
             payment_status: obj.payment_status,
           }, event.id);
+          if (kind === "paid") {
+            if (!obj.metadata?.order_id) throw new Error("Order ID missing");
+            await deliverOrderTickets(obj.metadata.order_id);
+          }
           return Response.json({ received: true });
         } catch (error) {
           console.error("[stripe-webhook] retry required", error instanceof Error ? error.message : "unknown");
