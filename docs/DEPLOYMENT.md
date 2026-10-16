@@ -61,3 +61,11 @@ The authorized operator can read exceptions at `/operations/reviews` via an ADMI
 - `fed69b87e62391332e1cdb91c3262c7d6922f9dc` passed both GitHub checks: `38956624758` (application) and `38956624629` (disposable PostgreSQL).
 - At last check, the newest Vercel deployment listed `READY` is `dpl_HGJMfSNBZnrYWuHhoyAiumDgQgxx` for **older** SHA `41871005e8f971e39444939547025e1c5df03550`. No Vercel READY proof for latest SHA was returned.
 - An authorized-scope explicit deployment request to existing team `team_5evutKT6yGLTYxyLNsFfl1eH`, project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp`, targeting production from `main`, failed with **HTTP 403 forbidden**, access to `takatakcas-projects` denied. No deployment was created and no force or bypass attempted. A team-authorized Vercel connection/CI credential is required to publish later commits. Git integration may resume separately; always verify actual SHA and public HTTPS.
+
+## Incident et vérifications du 16 octobre (dernière reprise)
+
+- Version GitHub validée en CI: `9b3182d8`, app `38957983237`, PostgreSQL `38957983184`, réussis. Le commit final de documentation est à vérifier séparément.
+- Vercel projet `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp`: dernière version READY retournée par le connecteur `dpl_Bhs6FEcmhLA5xUeoP7473c2kMFAv`, SHA ancien `e69cfccf`. POST déploiement explicite antérieur: HTTP 403 scope `takatakcas-projects`. Ne pas le répéter sans changement d'autorisation.
+- Liste des domaines du projet: uniquement `festiiceca.vercel.app` (vérifié au sens de configuration Vercel), aucun domaine `.ca`. Le HTTP/HTTPS public et le hash déployé ne sont pas validés.
+- Migration non déployée `20261016200000_checkout_session_compensation.sql` après toutes les migrations de billetterie précédentes. Vérifier l'ID Supabase et une sauvegarde avant toute application.
+- Pour une erreur lors de la création de Stripe Checkout: le serveur expire d'abord la session Stripe active; ensuite il libère la réservation, même si le rattachement Stripe à la commande a échoué. Ne pas libérer si l'expiration ne peut pas être confirmée. Le webhook de paiement demeure indépendant de la panne du fournisseur de courriels.

@@ -61,3 +61,14 @@ Canonical public domain is unverified (`festiice.ca` vs `festi-ice.ca`) and brow
 - `fed69b87e62391332e1cdb91c3262c7d6922f9dc` passed both GitHub checks: `38956624758` (application) and `38956624629` (disposable PostgreSQL).
 - At last check, the newest Vercel deployment listed `READY` is `dpl_HGJMfSNBZnrYWuHhoyAiumDgQgxx` for **older** SHA `41871005e8f971e39444939547025e1c5df03550`. No Vercel READY proof for latest SHA was returned.
 - An authorized-scope explicit deployment request to existing team `team_5evutKT6yGLTYxyLNsFfl1eH`, project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp`, targeting production from `main`, failed with **HTTP 403 forbidden**, access to `takatakcas-projects` denied. No deployment was created and no force or bypass attempted. A team-authorized Vercel connection/CI credential is required to publish later commits. Git integration may resume separately; always verify actual SHA and public HTTPS.
+
+## Reprise du 16 octobre 2026 — fiabilité Stripe et compensation des réservations
+
+- Dernier commit fonctionnel testé: `9b3182d8fe12ed7b13b99acca5d2f413e07dd53f` sur `main`. GitHub Actions app `38957983237` SUCCESS; base PostgreSQL 17 isolée `38957983184` SUCCESS.
+- Correction `src/lib/checkout.server.ts`: `settleCheckout()` vérifie `paymentProcessingConfigured()` plutôt que `fulfillmentConfigured()`. Un paiement existant peut être rapproché même quand Resend est hors service; les tentatives de livraison continuent de retourner une erreur réessayable. Nouvel invariant dans `tests/payment-readiness.test.ts`.
+- Migration `20261016200000_checkout_session_compensation.sql`: `cancel_checkout_order()` libère les places d'une commande en attente même si la session Stripe a été réellement expirée mais n'a pas pu être sauvegardée côté base. Si un autre ID Stripe a été persisté, la libération est REFUSÉE. Le serveur ne fait cet appel de compensation qu'après la réussite de l'expiration Stripe. Cas testés avec le véritable RPC initial dans `tests/sql/checkout-integration-assertions.sql`, exécutés dans `.github/workflows/database-guards.yml`.
+- Vercel: le dernier résultat READY retourné appartient au SHA plus ancien `e69cfccf66bba66d822095ab37c9a90bf1419ebc` (déploiement `dpl_Bhs6FEcmhLA5xUeoP7473c2kMFAv`), PAS à `9b3182d8`. Le déploiement explicite était auparavant refusé avec HTTP 403 sur l'équipe `takatakcas-projects`. Ne pas annoncer une publication du code récent.
+- `list_project_domains` montre uniquement `festiiceca.vercel.app`, vérifié chez Vercel. Aucun domaine FESTI-ICE personnalisé n'est attaché au projet; accès public HTTPS non testé.
+- Aucune migration Supabase n'a été appliquée en production; aucun paiement Stripe réel ni email Resend réel n'a été testé. L'intégration centrale de l'identité TAKATAK reste bloquante pour les droits de personnel.
+
+**État:** code GitHub + CI réussis; publication de la version récente non confirmée; ventes désactivées, site et paiements réels non acceptés.

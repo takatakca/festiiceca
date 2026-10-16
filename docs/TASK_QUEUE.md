@@ -53,3 +53,14 @@ Continue from the earliest executable task. Document blockages, no speculative s
 ## Active deployment blocker
 
 **P0 BLOCKED:** Vercel POST /v13/deployments denied team access with 403 `takatakcas-projects`. Check a team-authorized Vercel connection and existing Git integration, then confirm a `READY` deployment with the latest `main` SHA and a public HTTP 200 on the approved custom domain. This is not a code compilation failure. Never override project protections or assume a prior READY represents new commits.
+
+## Reprise Stripe — 16 octobre 2026
+
+| Priorité | Statut | Prochaine action vérifiable |
+| --- | --- | --- |
+| P0 | TERMINÉ en code, CI verte | Webhook de paiement indépendant de Resend, commit `c411cf0a` puis `9b3182d8`. |
+| P0 | TERMINÉ en code, CI PostgreSQL verte | Compensation de commande Stripe non liée, après expiration Stripe confirmée, sans libérer la réservation d'une autre session: migration `20261016200000_checkout_session_compensation.sql`, test d'intégration `38957983184`. |
+| P0 | BLOQUÉ — droits Vercel | Restaurer l'autorisation équipe `takatakcas-projects` ou vérifier son Git auto-deploy, publier le SHA courant, puis comparer au SHA de `GET /api/health` sur HTTPS public. Le plus récent READY observé est `e69cfccf` seulement. |
+| P0 | BLOQUÉ — environnement | Confirmer le vrai projet Supabase et les secrets protégés Stripe/Resend, domaine officiel et droits TAKATAK; ensuite seulement les tests E2E. |
+| P1 | NON RÉALISÉ | Clôture auditée des dossiers `financial_event_reviews` par administrateur avec raison obligatoire; aucune action financière automatique. |
+| P1 | NON RÉALISÉ | Réconciliation / renvoi des emails de billets après épuisement des retries Stripe; traitement météo, annulation et reprogrammation réels. |

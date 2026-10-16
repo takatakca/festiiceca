@@ -1,46 +1,48 @@
-# FESTI-ICE — Agent handoff
+# FESTI-ICE — Relève technique à jour
 
-**Updated:** 2026-10-16, America/Toronto.
-**Repo and branch:** `takatakca/festiiceca` / `main`. GitHub default branch, no open PRs or issues at start of this session.
-**Previous final SHA:** `66d858b0cf1392135630e16c42d3b01b82db9932`.
-**Last feature commit before final documentation:** `cd56a5342917176b1d11ecfa1cd7451c2bf26bb5`. Check `main` for the final handoff SHA.
-**Last completed task:** harden paid QR admission, integrate the real foundational checkout SQL into isolated PostgreSQL CI, and add a durable finance manual-review ledger + restricted dashboard.
-**Current task:** reconcile actual Supabase project and master TAKATAK entitlement, verify Vercel deployment for final `main` SHA, then run real payment/email/scanner test end to end.
+**Dernière mise à jour :** 2026-10-16, fuseau America/Toronto.
+**Dépôt :** `takatakca/festiiceca`, branche de publication `main`.
+**Dernier commit de code entièrement validé :** `9b3182d8fe12ed7b13b99acca5d2f413e07dd53f`. Le commit qui contient cette relève est ultérieur; récupérer son SHA exact depuis GitHub.
+**Dernière tâche terminée :** dissocier l'enregistrement des paiements du service Resend et compenser les holds de checkout Stripe expiré/non persisté.
+**Tâche actuelle :** rétablir la publication de la bonne version sur Vercel; autoriser et vérifier le backend FESTI-ICE, puis compléter les fonctions bloquées.
 
-## Files touched in current session
-- `WORKLOG.md`; `supabase/migrations/20261016183000_secure_ticket_redemption.sql`; `tests/sql/gate-fixtures.sql`; `tests/sql/gate-assertions.sql`.
-- `tests/sql/checkout-integration-fixtures.sql`, `tests/sql/checkout-integration-assertions.sql`; `.github/workflows/database-guards.yml`, `.github/workflows/ci.yml`.
-- `supabase/migrations/20261016193000_financial_event_review_ledger.sql`; `src/lib/checkout.server.ts`, `src/routes/api/stripe/webhook.ts`, `tests/sql/financial-review-assertions.sql`.
-- `src/routes/api/operations/financial-reviews.ts`, `src/routes/operations_/reviews.tsx`, `src/routes/operations.tsx`.
-- The five required docs, `docs/PRODUCTION_RELEASE.md` and this log.
+## Fichiers modifiés dans cette reprise
 
-## Work/verification evidence
-- Read `AGENTS.md`, `WORKLOG.md`, previous `docs/AGENT_HANDOFF.md` and `TASK_QUEUE.md`, GitHub branch/commits/tree, open PRs/issues and deployment status before editing.
-- `38955176208` database guard tests passed after fixture correction; `38955646908` passed with `pgcrypto` in the Supabase-style `extensions` schema.
-- `38956038605` ledger tests succeeded.
-- Latest verified feature `cd56a534`: **GitHub Actions application CI `38956304449` SUCCESS and PostgreSQL database guard CI `38956304352` SUCCESS.** The latter exercises original `20261014190000` checkout RPCs, new QR gate and financial exception ledger.
-- Vercel auto-deploy still connected to `main`: previous READY at `dpl_HGJMfSNBZnrYWuHhoyAiumDgQgxx` / commit `41871005`; **a later matching READY SHA was not visible when documentation started**. Re-query before declaring new delivery.
-- Direct HTTPS inspection of `https://festiice.ca` and `https://festi-ice.ca` did not establish a response. Vercel aliases are protected by team SSO; no verified public custom domain.
-- No Stripe transaction, Resend email, authorized Supabase migration or production database writes were performed.
+- `WORKLOG.md` (claim puis clôture).
+- `src/lib/checkout.server.ts` : `settleCheckout` protège les paiements avec `paymentProcessingConfigured()`, sans exiger Resend; `deliverOrderTickets` continue de vérifier Resend.
+- `tests/payment-readiness.test.ts` : régression de paiement pendant une panne de messagerie.
+- `supabase/migrations/20261016200000_checkout_session_compensation.sql` : compensation sûre de hold sans ID de session persisté, après expiration Stripe.
+- `tests/sql/checkout-integration-assertions.sql` : cas de compensation et de refus d'une session différente; correction de l'ordre d'évaluation SQL du test; `.github/workflows/database-guards.yml` : application de la migration dans une base jetable avant les assertions.
+- `docs/PROJECT_STATUS.md`, `docs/TASK_QUEUE.md`, `docs/AGENT_HANDOFF.md`, `docs/DEPLOYMENT.md`, `docs/DECISIONS.md` mis à jour.
 
-## Current blockers (do not disguise them)
-1. The actual FESTI-ICE source database ID is unknown. Repo `supabase/config.toml` has `xsozkxcnjmyjjaorkxlx`; connected Supabase named project `anyiaszbjsyrxfgjbwdt` is separate, with no app schema. **Do not migrate to it blindly or create billable projects.**
-2. Vercel project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp` lacked inspected production environment variable keys for approved Supabase, Stripe, and Resend. Checkout sales must remain disabled.
-3. GROUPE TAKATAK central identity and tenant-scoped `festiice` entitlement are not integrated. Current app `user_roles` and local Supabase OTP are not sufficient to grant live cross-product rights; no production staff authorization claimed.
-4. Domain `festiice.ca` versus `festi-ice.ca` unconfirmed, SSO and DNS unresolved. No public HTTP 200 verified.
-5. Stripe refunds and disputes are now durably recorded, but partial refund resolution, staff action logging, chargeback handling and scheduled reconciliation remain incomplete. Email delivery and QR scanner are not tested against actual configured vendors.
-6. Full migrations are not run against real Supabase, and cross-tenant/paid order E2E not accepted. Ephemeral PostgreSQL 17 tests are valuable but NOT proof of live financial integration.
+## Vérifications réelles
 
-## Deployment state and required access
-- App GitHub code is pushed. The last confirmed READY Vercel deployment is for `41871005`, not the current feature SHA. Auto deployment may produce newer builds. Confirm with the Vercel connector and source SHA.
-- Need verified Supabase backend ref with migration and backup authority, TAKATAK master product membership mapping, approved official domain/DNS, and protected Stripe test/Resend sender credentials. Never print secret values.
-- Sale switch `FESTIICE_CHECKOUT_ENABLED` stays OFF. Pausing sales must NOT stop existing paid webhook settlement/refunds.
+- Lecture d'`AGENTS.md`, précédente relève, file de tâches, WORKLOG, commits, PRs/issues (aucune ouverte), routes/SQL et CI.
+- GitHub Actions commit `9b3182d8`: app CI `38957983237` SUCCESS (installation/lint sémantique/tests Node/build SSR/smoke/Vercel artifact); PostgreSQL CI `38957983184` SUCCESS, intégration migration initiale + compensation, capacité et paiement.
+- Échecs intermédiaires `0cc9906e` et `0403b3da` traités: guillemets SQL dollar-quotés, puis test d'effets secondaires exécutés dans des statements SQL distincts. Dernier CI vert, ne pas répéter ces erreurs résolues.
+- Vercel `list_deployments`: dernier READY visible `dpl_Bhs6FEcmhLA5xUeoP7473c2kMFAv` au SHA **plus ancien** `e69cfccf66bba66d822095ab37c9a90bf1419ebc`. Aucun READY vérifié pour `9b3182d8`; POST déploiement manuel précédent 403 Forbidden sur `takatakcas-projects`.
+- Vercel domaines: seul `festiiceca.vercel.app` est inscrit et vérifié, pas de domaine officiel `.ca`. Aucun GET public avec SHA validé.
+- Aucun accès/modification à une production Supabase, aucun paiement/courriel/test scanner réel.
 
-## Exact next action for the next agent
-Read `AGENTS.md`, `WORKLOG.md` and this handoff; fetch current `main` SHA, CI runs and Vercel project deployments. Repair failed CI if any and confirm same-SHA Vercel READY; verify HTTPS health on the approved public domain. Identify the correct Supabase project before touching migrations; conduct an authorized isolated payment-to-email-to-scanner-to-refund test. Only then consider sales launch. Continue the TAKATAK identity bridge contract, background webhook reconciliation and operational weather/rebooking tasks without duplicating earlier code.
+## Blocages et accès requis
 
-## Addendum: latest build verified, deployment access NOT verified
+1. **Vercel :** droits de déploiement au scope `takatakcas-projects` (403); vérifier/autoriser le connecteur ou l'intégration Git, sans contourner la protection ni force-push. Vérifier la vraie publication SHA puis `/api/health`.
+2. **Supabase :** code `supabase/config.toml` = `xsozkxcnjmyjjaorkxlx`; projet Supabase nommé FESTI ICE visible = `anyiaszbjsyrxfgjbwdt` mais sans tables applicatives lors du dernier audit. Ne migrer aucun sans preuve d'autorité et sauvegarde; ne pas créer de projet facturable.
+3. **Domaine :** `festiice.ca` vs `festi-ice.ca` non résolu, absent de Vercel. Besoin d'une décision propriétaire fondée sur la configuration DNS; vérifier HTTPS public.
+4. **Paiements :** secrets Stripe/Resend et expéditeur authentifié absents des variables projet inspectées auparavant; aucun E2E réel de commande, livraison QR, scan, remboursement ou reprise après panne.
+5. **Identité :** le master GROUPE TAKATAK est l'autorité pour l'identité et les droits par produit/entreprise. Le `user_roles` Supabase local ne constitue pas à lui seul un bridge TAKATAK validé. Intégration centrale non prouvée, données interentreprises strictement cloisonnées.
+6. **Tâches ouvertes :** résolution auditée des dossiers financiers, reprises d'email après fin des webhooks, météo/replanification et tests charge/accessibilité. Une tentative de création de la migration de résolution a été refusée par l'outil; aucun fichier correspondant n'a été commité.
 
-- GitHub `fed69b87` Actions `38956624758` and `38956624629` completed SUCCESS.
-- A manual Vercel create-deployment request for current `main` under team `takatakcas-projects` returned **403 Forbidden**. No deployment from that request occurred. Last Vercel READY confirmed by list API at `41871005` (`dpl_HGJMfSNBZnrYWuHhoyAiumDgQgxx`), not `fed69b87`.
-- **Exact next deploy action:** recover authorized Vercel team/project credentials or Git integration rights, check latest `main` release, re-run/redeploy once, then independently GET HTTPS `/api/health` and compare its SHA. This permission issue must not be solved through destructive reconfiguration.
+## Statut réel
+
+**Code :** poussé sur `main`, CI verte pour `9b3182d8`.
+**Déploiement :** Vercel READY pour un SHA précédent seulement, accès public non prouvé.
+**Ventes :** `FESTIICE_CHECKOUT_ENABLED` doit rester `false`.
+**Sécurité :** RPC en repo et tests éphémères, mais dernières migrations non appliquées à la base autorisée.
+
+## Prochaine action exacte
+
+1. Recharger `AGENTS.md`, `WORKLOG.md` et cette relève; comparer `main` SHA, GitHub Actions, déploiement Vercel et exact URL/HTTPS; corriger toute CI régressive.
+2. Avec une connexion Vercel réellement autorisée à `takatakcas-projects`, déclencher/vérifier la version `main` actuelle puis `GET /api/health` depuis le domaine officiel vérifié.
+3. Identifier le projet Supabase original autorisé, faire sauvegarde, appliquer migrations avec stratégie de rollback, vérifier permissions/RLS et entitlements centralisés TAKATAK.
+4. Configurer les vrais secrets côté hébergeur, tester Stripe en environnement de test (paiement→QR→Resend→scan→remboursement), puis poursuivre les modules financiers et météo non terminés.

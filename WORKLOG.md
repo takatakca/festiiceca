@@ -3,7 +3,7 @@
 Newest first, one line per piece of work. Rule: `AGENTS.md` › Work log rule.
 Format: `YYYY-MM-DD | agent | branch → PR | status | what | next step`
 
-- 2026-10-16 | GPT-6 (Stripe lifecycle) | main → direct | active | Correct paid webhook settlement during email outage, checkout compensation, add regressions and preserve retryable delivery | verify CI/Vercel and handoff
+- 2026-10-16 | GPT-6 (Stripe lifecycle) | main → direct | done: code/CI, blocked: production authorization | Fixed paid-event settlement independent of Resend and safe Stripe-expired orphan session compensation; commit 9b3182d8 and both CI jobs pass | recover Vercel 403/team rights, verify latest SHA/public domain, identify real Supabase and complete Stripe/Resend E2E
 
 - 2026-10-16 | GPT-6 (gate + finance) | main → direct | done: features/CI, blocked: Vercel team 403 and live backends | Paid/date/role-gated refund-safe QR redemption, foundational checkout RPC tests, durable signed Stripe refund/dispute review queue and admin-only finance viewer; GitHub CI green at fed69b87 | recover Vercel team deployment authorization, verify same-SHA READY/public HTTPS, reconcile authoritative Supabase/TAKATAK identity and test Stripe/Resend/QR before opening sales
 
