@@ -29,6 +29,8 @@ jobs:
       # Keep semantic ESLint rules enforced; normalize formatting separately.
       - name: Lint (semantic rules)
         run: "npx eslint . --rule 'prettier/prettier: off'"
+      - name: Payment readiness regression tests
+        run: node --experimental-strip-types --test tests/payment-readiness.test.ts
       - name: Build server
         run: npm run build
 

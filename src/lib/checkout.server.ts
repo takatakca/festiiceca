@@ -4,6 +4,8 @@
  */
 import { createClient } from "@supabase/supabase-js";
 import QRCode from "qrcode";
+import { paymentConfigured, fulfillmentConfigured } from "./payment-readiness";
+export { paymentConfigured, fulfillmentConfigured } from "./payment-readiness";
 
 type Cart = {
   slotId: string;
@@ -22,24 +24,6 @@ type Order = {
  * Fulfillment must remain on when sales are paused: Stripe can deliver paid
  * events long after the checkout button has been closed. Never couple the two.
  */
-export function fulfillmentConfigured(): boolean {
-  const env = process.env;
-  const ref = env["FESTIICE_APPROVED_SUPABASE_PROJECT_REF"];
-  const origin = env["FESTIICE_CANONICAL_ORIGIN"];
-  return !!ref && /^[a-z0-9]{20}$/.test(ref) &&
-    !!origin && /^https:\/\/[^/]+$/.test(origin) &&
-    env["SUPABASE_URL"] === "https://" + ref + ".supabase.co" &&
-    !!env["SUPABASE_SERVICE_ROLE_KEY"] &&
-    !!env["SUPABASE_PUBLISHABLE_KEY"] &&
-    !!env["STRIPE_SECRET_KEY"] && !!env["STRIPE_WEBHOOK_SECRET"] &&
-    !!env["RESEND_API_KEY"] && !!env["FESTIICE_TICKET_FROM_EMAIL"] &&
-    /^[^\s@]+@[^\s@]+$/.test(env["FESTIICE_TICKET_FROM_EMAIL"]);
-}
-
-export function paymentConfigured(): boolean {
-  return fulfillmentConfigured() &&
-    process.env["FESTIICE_CHECKOUT_ENABLED"] === "true";
-}
 
 function database() {
   const url = process.env["SUPABASE_URL"]!;
