@@ -35,6 +35,29 @@ export const Route = createFileRoute("/api/stripe/webhook")({
             "checkout.session.expired": "cancel",
             "checkout.session.async_payment_failed": "cancel",
           };
+          // A full Stripe refund revokes all associated QR tickets. Partial
+          // refunds require human assessment; do not void the entire order.
+          if (event.type === "charge.refunded") {
+            const charge = event.data?.object as (typeof event.data.object & {
+              payment_intent?: string | null;
+              amount?: number; amount_refunded?: number; refunded?: boolean;
+              currency?: string;
+            }) | undefined;
+            if (!charge || typeof charge.payment_intent !== "string" ||
+                charge.currency?.toLowerCase() !== "cad" ||
+                !Number.isSafeInteger(charge.amount) ||
+                !Number.isSafeInteger(charge.amount_refunded)) {
+              console.error("[refund] unrecognized Stripe charge: manual review required");
+              return Response.json({ received: true, manualReview: true });
+            }
+            if (!charge.refunded || charge.amount_refunded !== charge.amount) {
+              console.error("[refund] partial refund: manual review required");
+              return Response.json({ received: true, manualReview: true });
+            }
+            const { recordFullRefund } = await import("@/lib/checkout.server");
+            await recordFullRefund(charge.payment_intent, event.id, charge.amount);
+            return Response.json({ received: true });
+          }
           const kind = types[event.type];
           if (!kind) return Response.json({ received: true });
           const obj = event.data?.object;

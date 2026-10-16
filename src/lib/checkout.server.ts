@@ -248,3 +248,25 @@ export async function getPublishedRemainingCapacity(): Promise<Map<string, numbe
     return new Map();
   }
 }
+
+/**
+ * Reflect ONLY a full Stripe refund that has already occurred. This never
+ * initiates a refund; the DB transaction revokes tickets and preserves audit.
+ */
+export async function recordFullRefund(
+  paymentIntent: string, eventId: string, amountCents: number,
+): Promise<void> {
+  if (!fulfillmentConfigured()) throw new Error("Refund reconciliation unavailable");
+  if (!paymentIntent.startsWith("pi_") || !eventId.startsWith("evt_") ||
+      !Number.isSafeInteger(amountCents) || amountCents <= 0)
+    throw new Error("Invalid refund event");
+  const { error } = await database().rpc("record_full_refund", {
+    _payment_intent: paymentIntent,
+    _stripe_event: eventId,
+    _refunded_amount: amountCents,
+  });
+  if (error) {
+    console.error("[refund] DB reconciliation failed", error.code);
+    throw new Error("Refund reconciliation pending");
+  }
+}
