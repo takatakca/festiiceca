@@ -69,3 +69,11 @@ The authorized operator can read exceptions at `/operations/reviews` via an ADMI
 - Liste des domaines du projet: uniquement `festiiceca.vercel.app` (vérifié au sens de configuration Vercel), aucun domaine `.ca`. Le HTTP/HTTPS public et le hash déployé ne sont pas validés.
 - Migration non déployée `20261016200000_checkout_session_compensation.sql` après toutes les migrations de billetterie précédentes. Vérifier l'ID Supabase et une sauvegarde avant toute application.
 - Pour une erreur lors de la création de Stripe Checkout: le serveur expire d'abord la session Stripe active; ensuite il libère la réservation, même si le rattachement Stripe à la commande a échoué. Ne pas libérer si l'expiration ne peut pas être confirmée. Le webhook de paiement demeure indépendant de la panne du fournisseur de courriels.
+
+## Admin-only financial review decisions — 2026-10-16
+
+New migration, **not applied to any live Supabase project:** `20261016210000_financial_review_resolution.sql`, dependent on `20261016193000_financial_event_review_ledger.sql` and existing `user_roles`. It adds a review reason and service-role-only RPC for audited REVIEWED/DISMISSED status. No money movement. PostgreSQL CI tests role restriction, reason audit and replay safety.
+
+`GET /api/operations/financial-reviews` remains restricted to ADMIN/SUPER_ADMIN. `PATCH` additionally requires `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=true` on the server, a verified Supabase project, same Origin, valid JWT, ADMIN/SUPER_ADMIN and a database re-check. The flag defaults OFF: do not configure it until the central TAKATAK entitlement bridge, correct tenant and authorized production credentials are tested.
+
+Vercel most recent observed READY `dpl_BtNDZxtMSu3HTvNdtV4Maj87wqpD` points to older `9e74fa87`. No latest-code/public `.ca` proof. To release: authorized Vercel team access, Git SHA match, public HTTPS `/api/health` match, then vendor E2E in an approved test environment.

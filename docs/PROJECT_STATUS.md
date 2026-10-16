@@ -72,3 +72,14 @@ Canonical public domain is unverified (`festiice.ca` vs `festi-ice.ca`) and brow
 - Aucune migration Supabase n'a été appliquée en production; aucun paiement Stripe réel ni email Resend réel n'a été testé. L'intégration centrale de l'identité TAKATAK reste bloquante pour les droits de personnel.
 
 **État:** code GitHub + CI réussis; publication de la version récente non confirmée; ventes désactivées, site et paiements réels non acceptés.
+
+## 2026-10-16 — Audited financial-review decisions (code/CI)
+
+- Added `supabase/migrations/20261016210000_financial_review_resolution.sql`: additive reason constraint and `resolve_financial_review` service-role RPC, admin/super-admin database role verification, row locking, REVIEWED/DISMISSED transitions, immutable resolution outcome on replay, and persisted actor/time/reason. No Stripe refunds or payments initiated.
+- Added `tests/sql/financial-review-resolution-assertions.sql` with isolated PostgreSQL 17 tests for gate-only-role denial, invalid reason denial, authorized audit, replay immutability, no money movement and revoked execution from `anon` and `authenticated`.
+- `GET/PATCH /api/operations/financial-reviews`: authenticated role-gated admin API. PATCH also requires the explicit server variable `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=true`, approved Supabase project, same-origin request, validated JSON and the SQL-level role check. The flag is intentionally absent/false by default until central TAKATAK entitlement and real backend acceptance.
+- `/operations/reviews`: existing read-only reviewer list now includes a genuine decision form, reason and status display, error feedback and automatic refresh. No client can issue Stripe refunds through this interface.
+- GitHub CI smoke checks PATCH with no enable flag returns HTTP 503; builds and disposable PostgreSQL tests validate the code. Application commit `cb8fd28e3c40b43b97603ca5180c7247ea8e1e07`; final documentation commit will be newer.
+- Vercel query from this session: newest observed READY `dpl_BtNDZxtMSu3HTvNdtV4Maj87wqpD` for **older SHA** `9e74fa87d3e6f91aeb802088be44ab8be72cc118`, not the review implementation. A new Vercel READY for final Git SHA and public HTTPS health remains **unverified**.
+
+**Important:** These are repository and disposable CI validations; approved Supabase, trusted TAKATAK product identity, real Stripe/Resend, canonical .ca domain and successful online payment/QR scans remain blocked. New ticket sales and admin financial writes must remain OFF.

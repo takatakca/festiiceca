@@ -3,7 +3,7 @@
 Newest first, one line per piece of work. Rule: `AGENTS.md` › Work log rule.
 Format: `YYYY-MM-DD | agent | branch → PR | status | what | next step`
 
-- 2026-10-16 | GPT-6 (finance review completion) | main → direct | active | Add audited closure of finance reviews restricted to administrators, verify PostgreSQL/CI and preserve Vercel deployment truth | commit and handoff
+- 2026-10-16 | GPT-6 (finance review completion) | main → direct | done: code/CI; live release blocked | Implemented audited administrator resolution of Stripe review records (SQL role checks, idempotent REVIWED/DISMISSED, API gate OFF by default, real form, SQL and SSR smoke tests), implementation at cb8fd28e | verify latest CI and Vercel SHA/public DNS; obtain authoritative Supabase and TAKATAK tenant entitlement approval before finance writes or sales
 - 2026-10-16 | GPT-6 (Stripe lifecycle) | main → direct | done: code/CI, blocked: production authorization | Fixed paid-event settlement independent of Resend and safe Stripe-expired orphan session compensation; commit 9b3182d8 and both CI jobs pass | recover Vercel 403/team rights, verify latest SHA/public domain, identify real Supabase and complete Stripe/Resend E2E
 
 - 2026-10-16 | GPT-6 (gate + finance) | main → direct | done: features/CI, blocked: Vercel team 403 and live backends | Paid/date/role-gated refund-safe QR redemption, foundational checkout RPC tests, durable signed Stripe refund/dispute review queue and admin-only finance viewer; GitHub CI green at fed69b87 | recover Vercel team deployment authorization, verify same-SHA READY/public HTTPS, reconcile authoritative Supabase/TAKATAK identity and test Stripe/Resend/QR before opening sales

@@ -118,3 +118,9 @@ The private review dashboard `/operations/reviews` is read-only and requires
 finance admin permission. No active payments or refunds were created in these
 offline tests. Any Vercel `READY` claim must be paired with the exact source
 commit and an independent HTTPS domain check.
+
+## 2026-10-16 manual financial-review release gate
+
+Run `20261016210000_financial_review_resolution.sql` only after identifying and backing up the approved Supabase project and applying the foundational finance-review ledger. PostgreSQL disposable fixtures validate the SQL; these do not constitute a real Stripe test. To enable administrative writes, confirm central TAKATAK product/tenant entitlements, then set `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=true` in protected server environment and validate a real authorized review without money movement. Default flag absent/false keeps PATCH at HTTP 503.
+
+Vercel `READY` last confirmed for older `9e74fa87` only, custom .ca domain unverified. Verify deployed SHA/HTTPS before any announcement.

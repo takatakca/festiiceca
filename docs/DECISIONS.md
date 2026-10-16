@@ -39,3 +39,9 @@ Updated: 2026-10-16.
 23. Les webhooks Stripe de paiements déjà payés NE doivent PAS exiger des identifiants Resend actifs pour persister le statut financier. `paymentProcessingConfigured` protège l'enregistrement; la livraison des QR vérifie `fulfillmentConfigured` séparément. Ne pas ouvrir de nouveaux achats sans Resend.
 24. Un checkout Stripe peut avoir été créé mais ne pas avoir été persisté dans `orders`. La compensation n'est permise qu'après une requête Stripe d'expiration réellement réussie ou événement d'expiration signé, et seulement pour commande encore `PENDING_PAYMENT`. Une autre session Stripe persistée est protégée contre la cancellation. Migration et essais PostgreSQL isolés: `20261016200000_checkout_session_compensation.sql`.
 25. La clôture administrative d'une revue financière n'a pas été publiée dans cette session. Ne pas présenter l'interface actuelle, en lecture seule, comme une interface de résolution.
+
+## Finance review write policy — 2026-10-16
+
+26. Manual financial event review is NOT an actual Stripe refund, and never modifies ticket/ledger payment amounts. Only state `REVIEWED` or `DISMISSED` with a meaningful 10–500 character reason. Record the human administrator's subject ID and time; hold a row lock and never overwrite an already completed resolution on replay.
+27. The protected PATCH endpoint checks both the present Supabase JWT/ADMIN role and SQL-level actor role through a service_role-only RPC. A separate `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED` server flag remains false until the master TAKATAK entitlement/tenant bridge and authoritative database are verified. Browser request validation alone is not sufficient.
+28. Do not conflate a Vercel `READY` for an old SHA with a successful release of current code. No paid ticketing or financial-write enablement without a verified production environment and DNS.

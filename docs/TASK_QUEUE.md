@@ -64,3 +64,12 @@ Continue from the earliest executable task. Document blockages, no speculative s
 | P0 | BLOQUÉ — environnement | Confirmer le vrai projet Supabase et les secrets protégés Stripe/Resend, domaine officiel et droits TAKATAK; ensuite seulement les tests E2E. |
 | P1 | NON RÉALISÉ | Clôture auditée des dossiers `financial_event_reviews` par administrateur avec raison obligatoire; aucune action financière automatique. |
 | P1 | NON RÉALISÉ | Réconciliation / renvoi des emails de billets après épuisement des retries Stripe; traitement météo, annulation et reprogrammation réels. |
+
+## Finance review closure and operations — 2026-10-16
+
+| Priorité | État | Preuve et prochaine étape |
+| --- | --- | --- |
+| P1 | CODE & POSTGRESQL CI | Admin financial review resolution with reason, actor audit, idempotent decision: `20261016210000_financial_review_resolution.sql`. Reviewer page + API connected. |
+| P0 | SAFE GATE OFF | Set `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=true` only after approved TAKATAK centralized product/tenant entitlement and right Supabase environment; do NOT enable now. |
+| P0 | UNVERIFIED RELEASE | Confirm a Vercel READY SHA matching latest `main`; previous deployment ready at `9e74fa87` only. Authorized custom domain + public HTTPS /api/health still unavailable. |
+| P0 | BLOCKED | Verify authoritative Supabase project, backup/migrations, Stripe/Resend test event lifecycle, staff role integration and canonical FESTI-ICE domain before operating real finance review writes or ticket sales. |
