@@ -111,7 +111,7 @@ END $$;
 -- If Stripe successfully expired a newly-created Checkout session but its
 -- ID could not be persisted, release only the pending unlinked hold.
 DO $$
-DECLARE v jsonb; v_id uuid; v_hold uuid;
+DECLARE v jsonb; v_id uuid; v_hold uuid; v_canceled boolean;
 BEGIN
  v := public.create_checkout_order(
    '33333333-3333-4333-8333-333333333333',
@@ -119,8 +119,11 @@ BEGIN
    false,'orphan@example.ca','Orphan Checkout','',0);
  v_id := (v->>'order_id')::uuid;
  SELECT hold_id INTO v_hold FROM public.orders WHERE id=v_id;
- IF NOT public.cancel_checkout_order(v_id,'cs_verified_expired_orphan')
-   OR (SELECT status FROM public.holds WHERE id=v_hold) <> 'RELEASED'
+ -- The cancellation and the resulting hold state require separate SQL
+ -- statements: PostgreSQL evaluation order within one expression is undefined.
+ v_canceled := public.cancel_checkout_order(v_id,'cs_verified_expired_orphan');
+ IF NOT v_canceled THEN RAISE EXCEPTION 'orphan cancellation returned false'; END IF;
+ IF (SELECT status FROM public.holds WHERE id=v_hold) <> 'RELEASED'
  THEN RAISE EXCEPTION 'orphan Stripe session hold was not released'; END IF;
  IF public.slot_remaining_capacity('33333333-3333-4333-8333-333333333333') <> 8
  THEN RAISE EXCEPTION 'orphan compensation leaked reserved capacity'; END IF;
