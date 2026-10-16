@@ -7,8 +7,9 @@ CREATE TYPE public.order_status AS ENUM ('DRAFT','PENDING_PAYMENT','PAID','CANCE
 CREATE TYPE public.hold_status AS ENUM ('ACTIVE','CONVERTED','RELEASED','EXPIRED');
 CREATE TYPE public.ticket_status AS ENUM ('VALID','USED','VOID','REFUNDED');
 CREATE SCHEMA IF NOT EXISTS extensions;
-CREATE FUNCTION extensions.gen_random_bytes(n integer) RETURNS bytea
-  LANGUAGE sql AS 'SELECT pg_catalog.gen_random_bytes(n)';
+-- Supabase installs pgcrypto in its extensions schema. Mirror the actual
+-- extension placement in this disposable database.
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
 
 CREATE TABLE public.seasons (
  id uuid PRIMARY KEY, is_active boolean NOT NULL,
