@@ -78,6 +78,8 @@ jobs:
         run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261014190000_checkout_transactional_foundation.sql
       - name: Apply checkout session guards on original checkout RPC
         run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016150000_checkout_session_guards.sql
+      - name: Apply orphaned Stripe session compensation guard
+        run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016200000_checkout_session_compensation.sql
       - name: Assert paid order, replay, pricing, cancellation and capacity invariants
         run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f tests/sql/checkout-integration-assertions.sql
       - name: Apply durable financial exception ledger

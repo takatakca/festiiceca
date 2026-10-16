@@ -108,7 +108,40 @@ BEGIN
   THEN RAISE EXCEPTION 'failed transactions leaked orders'; END IF;
 END $$;
 
-DO $$
+-- If Stripe successfully expired a newly-created Checkout session but its
+-- ID could not be persisted, release only the pending unlinked hold.
+DO $
+DECLARE v jsonb; v_id uuid; v_hold uuid;
+BEGIN
+ v := public.create_checkout_order(
+   '33333333-3333-4333-8333-333333333333',
+   '[{"code":"ADULT","quantity":1}]'::jsonb,
+   false,'orphan@example.ca','Orphan Checkout','',0);
+ v_id := (v->>'order_id')::uuid;
+ SELECT hold_id INTO v_hold FROM public.orders WHERE id=v_id;
+ IF NOT public.cancel_checkout_order(v_id,'cs_verified_expired_orphan')
+   OR (SELECT status FROM public.holds WHERE id=v_hold) <> 'RELEASED'
+ THEN RAISE EXCEPTION 'orphan Stripe session hold was not released'; END IF;
+ IF public.slot_remaining_capacity('33333333-3333-4333-8333-333333333333') <> 8
+ THEN RAISE EXCEPTION 'orphan compensation leaked reserved capacity'; END IF;
+
+ -- But a persisted session ID cannot be canceled by a different ID.
+ v := public.create_checkout_order(
+   '33333333-3333-4333-8333-333333333333',
+   '[{"code":"ADULT","quantity":1}]'::jsonb,
+   false,'protected@example.ca','Protected Session','',0);
+ v_id := (v->>'order_id')::uuid;
+ UPDATE public.orders SET stripe_checkout_session_id='cs_actual_active'
+ WHERE id=v_id;
+ IF public.cancel_checkout_order(v_id,'cs_unrelated') THEN
+   RAISE EXCEPTION 'different live Checkout session was canceled'; END IF;
+ IF (SELECT status FROM public.orders WHERE id=v_id) <> 'PENDING_PAYMENT'
+ THEN RAISE EXCEPTION 'incorrect session cancellation mutated order'; END IF;
+ IF NOT public.cancel_checkout_order(v_id,'cs_actual_active') THEN
+   RAISE EXCEPTION 'matching Checkout session not cancellable'; END IF;
+END $;
+
+DO $
 BEGIN
  IF has_function_privilege('anon',
   'public.create_checkout_order(uuid,jsonb,boolean,text,text,text,integer)','EXECUTE')
