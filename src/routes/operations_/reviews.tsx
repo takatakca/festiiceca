@@ -4,7 +4,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle, ArrowLeft, RefreshCcw, ShieldCheck } from "lucide-react";
 
-export const Route = createFileRoute("/operations/reviews")({
+export const Route = createFileRoute("/operations_/reviews")({
   head: () => ({ meta: [
     { title: "FESTI-ICE — Révision des incidents financiers" },
     { name: "robots", content: "noindex,nofollow" },

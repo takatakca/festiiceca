@@ -109,6 +109,11 @@ function OperationsPage() {
         Gestion des créneaux FESTI-ICE. Toutes les modifications exigent un rôle autorisé,
         une confirmation et un motif archivé. Aucun renseignement de commande client n'est affiché.
       </p>
+      {session && (
+        <a href="/operations/reviews" className="mt-5 inline-flex rounded-full border border-border px-5 py-3 text-xs font-bold uppercase text-primary">
+          Révisions financières (administration)
+        </a>
+      )}
       {!session && (
         <div className="mt-8 rounded-2xl border border-border bg-card p-6">
           <LockKeyhole className="mb-3 text-primary" aria-hidden/>

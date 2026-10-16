@@ -60,6 +60,10 @@ jobs:
           grep -q 'personnel' /tmp/festiice-personnel.html
           curl --fail --silent http://127.0.0.1:8080/operations -o /tmp/festiice-operations.html
           grep -q 'Exploitation' /tmp/festiice-operations.html
+          curl --fail --silent http://127.0.0.1:8080/operations/reviews -o /tmp/festiice-finance.html
+          grep -q 'financiers\|financière\|financi' /tmp/festiice-finance.html
+          status=$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/operations/financial-reviews)
+          [ "$status" = "503" ]
           status=$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/operations/sessions)
           [ "$status" = "503" ]
           status=$(curl --silent -o /dev/null -w '%{http_code}' -X PATCH \
