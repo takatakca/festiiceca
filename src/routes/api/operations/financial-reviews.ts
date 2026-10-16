@@ -61,7 +61,6 @@ export const Route = createFileRoute("/api/operations/financial-reviews")({
           return new Response("Unavailable", { status: 503 });
         }
       },
-    },
       PATCH: async ({ request }) => {
         // Default CLOSED: legacy local Supabase roles are not enough to
         // authorize a financial write in GROUPE TAKATAK production.
