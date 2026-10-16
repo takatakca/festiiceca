@@ -38,3 +38,9 @@
 
 ## Exact next action for the next agent
 Read `AGENTS.md`, `WORKLOG.md` and this handoff; fetch current `main` SHA, CI runs and Vercel project deployments. Repair failed CI if any and confirm same-SHA Vercel READY; verify HTTPS health on the approved public domain. Identify the correct Supabase project before touching migrations; conduct an authorized isolated payment-to-email-to-scanner-to-refund test. Only then consider sales launch. Continue the TAKATAK identity bridge contract, background webhook reconciliation and operational weather/rebooking tasks without duplicating earlier code.
+
+## Addendum: latest build verified, deployment access NOT verified
+
+- GitHub `fed69b87` Actions `38956624758` and `38956624629` completed SUCCESS.
+- A manual Vercel create-deployment request for current `main` under team `takatakcas-projects` returned **403 Forbidden**. No deployment from that request occurred. Last Vercel READY confirmed by list API at `41871005` (`dpl_HGJMfSNBZnrYWuHhoyAiumDgQgxx`), not `fed69b87`.
+- **Exact next deploy action:** recover authorized Vercel team/project credentials or Git integration rights, check latest `main` release, re-run/redeploy once, then independently GET HTTPS `/api/health` and compare its SHA. This permission issue must not be solved through destructive reconfiguration.

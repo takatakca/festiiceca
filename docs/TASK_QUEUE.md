@@ -49,3 +49,7 @@ Continue from the earliest executable task. Document blockages, no speculative s
 | P0 | BLOCKED | Resolve actual Supabase project, owner-approved tenant and TAKATAK product entitlement, domain, Vercel environment secrets and real Stripe/Resend event testing. |
 | P0 | NEEDS VERIFICATION | For latest `main` SHA, verify both GitHub Actions and matching Vercel production-target READY; publicly check HTTPS `/api/health` only after canonical domain set. |
 | P1 | TODO | Reliable webhook delivery recovery and reconciliation after retry window, partial-refund staff state/audit, chargebacks, weather/rescheduling and explicit customer ticket resend by verified owner. |
+
+## Active deployment blocker
+
+**P0 BLOCKED:** Vercel POST /v13/deployments denied team access with 403 `takatakcas-projects`. Check a team-authorized Vercel connection and existing Git integration, then confirm a `READY` deployment with the latest `main` SHA and a public HTTP 200 on the approved custom domain. This is not a code compilation failure. Never override project protections or assume a prior READY represents new commits.

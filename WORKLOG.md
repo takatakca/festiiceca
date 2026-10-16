@@ -3,7 +3,7 @@
 Newest first, one line per piece of work. Rule: `AGENTS.md` › Work log rule.
 Format: `YYYY-MM-DD | agent | branch → PR | status | what | next step`
 
-- 2026-10-16 | GPT-6 (gate + finance) | main → direct | done (code/CI; live integration blocked) | Paid/date/role-gated refund-safe QR redemption; actual foundation checkout RPC integration tests; durable Stripe refund/dispute review ledger and admin-only finance dashboard; CI green at cd56a534 | verify newest Vercel SHA, correct Supabase and TAKATAK entitlement, DNS, then complete Stripe/Resend/QR E2E before sales
+- 2026-10-16 | GPT-6 (gate + finance) | main → direct | done: features/CI, blocked: Vercel team 403 and live backends | Paid/date/role-gated refund-safe QR redemption, foundational checkout RPC tests, durable signed Stripe refund/dispute review queue and admin-only finance viewer; GitHub CI green at fed69b87 | recover Vercel team deployment authorization, verify same-SHA READY/public HTTPS, reconcile authoritative Supabase/TAKATAK identity and test Stripe/Resend/QR before opening sales
 
 - 2026-10-16 | GPT-6 (operations) | main → direct | done (code and ephemeral CI; live identity blocked) | Added /operations responsive dashboard, JWT/operator role-gated GET/PATCH API, database-locked/role-checked OPEN/CLOSED audited transitions, isolated PostgreSQL tests, CI smoke; READY at 4ce8b291 | verify current SHA, reconcile TAKATAK master identity, correct Supabase DB and domain before enabling roles/sales
 

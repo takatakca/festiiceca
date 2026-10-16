@@ -55,3 +55,9 @@ The first refuses any scanner token unless the authenticated actor has an approv
 The authorized operator can read exceptions at `/operations/reviews` via an ADMIN/SUPER_ADMIN-only API. The page has no action to refund customers. Current Vercel production variables and the real Supabase identity/project have NOT been verified: application build success does not make finance or scanning live.
 
 `database-guards.yml` now runs (1) the original legacy-style fixtures with QR/finance hardening, and (2) a **second isolated Postgres database** applying the actual foundation checkout RPC migration, then transaction tests of pricing, holds, paid QR issuance, replay, cancellation and capacity. Both do not touch real production or Supabase.
+
+## Final verification and deployment access blocker — 2026-10-16
+
+- `fed69b87e62391332e1cdb91c3262c7d6922f9dc` passed both GitHub checks: `38956624758` (application) and `38956624629` (disposable PostgreSQL).
+- At last check, the newest Vercel deployment listed `READY` is `dpl_HGJMfSNBZnrYWuHhoyAiumDgQgxx` for **older** SHA `41871005e8f971e39444939547025e1c5df03550`. No Vercel READY proof for latest SHA was returned.
+- An authorized-scope explicit deployment request to existing team `team_5evutKT6yGLTYxyLNsFfl1eH`, project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp`, targeting production from `main`, failed with **HTTP 403 forbidden**, access to `takatakcas-projects` denied. No deployment was created and no force or bypass attempted. A team-authorized Vercel connection/CI credential is required to publish later commits. Git integration may resume separately; always verify actual SHA and public HTTPS.

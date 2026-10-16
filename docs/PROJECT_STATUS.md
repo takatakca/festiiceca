@@ -55,3 +55,9 @@
 
 ### Remaining hard blocks
 Canonical public domain is unverified (`festiice.ca` vs `festi-ice.ca`) and browser access was unavailable during checks. The configured Vercel project had no FESTI-ICE service environment variables in its inspected metadata. The Supabase code ref `xsozkxcnjmyjjaorkxlx` is different from the connected `FESTI ICE` project ref `anyiaszbjsyrxfgjbwdt` (reported empty). The TAKATAK master entitlement integration and Stripe/Resend real test payments remain incomplete. **Sales remain OFF.**
+
+## Final verification and deployment access blocker — 2026-10-16
+
+- `fed69b87e62391332e1cdb91c3262c7d6922f9dc` passed both GitHub checks: `38956624758` (application) and `38956624629` (disposable PostgreSQL).
+- At last check, the newest Vercel deployment listed `READY` is `dpl_HGJMfSNBZnrYWuHhoyAiumDgQgxx` for **older** SHA `41871005e8f971e39444939547025e1c5df03550`. No Vercel READY proof for latest SHA was returned.
+- An authorized-scope explicit deployment request to existing team `team_5evutKT6yGLTYxyLNsFfl1eH`, project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp`, targeting production from `main`, failed with **HTTP 403 forbidden**, access to `takatakcas-projects` denied. No deployment was created and no force or bypass attempted. A team-authorized Vercel connection/CI credential is required to publish later commits. Git integration may resume separately; always verify actual SHA and public HTTPS.
