@@ -58,6 +58,8 @@ jobs:
           grep -q 'billets' /tmp/festiice-billets.html
           curl --fail --silent http://127.0.0.1:8080/personnel -o /tmp/festiice-personnel.html
           grep -q 'personnel' /tmp/festiice-personnel.html
+          curl --fail --silent http://127.0.0.1:8080/api/health -o /tmp/festiice-health.json
+          node -e "const h=require('/tmp/festiice-health.json'); if (h.ok!==true || h.service!=='festiice') process.exit(1)"
           status=$(curl --silent -o /dev/null -w '%{http_code}' -X POST \
             -H 'content-type: application/json' --data '{}' http://127.0.0.1:8080/api/checkout)
           [ "$status" = "503" ]
