@@ -1,0 +1,52 @@
+name: FESTI-ICE database guard tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checkout-guards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: festiice_ci
+          POSTGRES_PASSWORD: test_only_password
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d festiice_ci"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGDATABASE: festiice_ci
+      PGPASSWORD: test_only_password
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Prepare PostgreSQL client
+        run: |
+          if ! command -v psql >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -qq -y postgresql-client
+          fi
+      - name: Bootstrap isolated schema
+        run: |
+          psql -v ON_ERROR_STOP=1 -f tests/sql/checkout-guard-fixtures.sql
+      - name: Apply checkout hardening migration
+        run: |
+          psql -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN;"
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016150000_checkout_session_guards.sql
+      - name: Run transactional checkout assertions
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/checkout-guard-assertions.sql
