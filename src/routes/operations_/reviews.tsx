@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle, ArrowLeft, RefreshCcw, ShieldCheck } from "lucide-react";
@@ -27,6 +27,12 @@ function FinanceReviewsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
+  const [selected, setSelected] = useState<Review | null>(null);
+  const [resolution, setResolution] = useState<"REVIEWED" | "DISMISSED">("REVIEWED");
+  const [reason, setReason] = useState("");
+  const [notice, setNotice] = useState("");
+  const [saving, setSaving] = useState(false);
+
 
   useEffect(() => {
     let active = true;
@@ -65,6 +71,42 @@ function FinanceReviewsPage() {
     return ()=>{active=false;};
   },[session,refresh]);
 
+  async function saveReview(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!session || !selected || saving || reason.trim().length < 10) return;
+    setSaving(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("/api/operations/financial-reviews", {
+        method: "PATCH",
+        headers: {
+          Authorization: "Bearer " + session.access_token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reviewId: selected.id,
+          resolution,
+          reason: reason.trim(),
+        }),
+      });
+      if (response.status === 503)
+        throw new Error("La résolution financière est désactivée. Un administrateur doit valider la configuration.");
+      if (response.status === 403 || response.status === 401)
+        throw new Error("Vous n'avez pas l'autorisation de modifier cet événement.");
+      if (!response.ok)
+        throw new Error("La décision n'a pas été enregistrée; veuillez vérifier le dossier.");
+      setSelected(null);
+      setReason("");
+      setNotice("Décision enregistrée dans le registre avec votre identité et le motif.");
+      setRefresh(previous => previous + 1);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Échec de la révision.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <main className="mx-auto max-w-4xl px-4 pb-32 pt-28 sm:px-6">
       <a href="/operations" className="inline-flex items-center gap-2 text-sm text-primary">
@@ -88,8 +130,9 @@ function FinanceReviewsPage() {
         <AlertTriangle className="shrink-0 text-primary" aria-hidden/>
         <p>
           Cette page est une liste en lecture seule. Pour traiter un litige,
-          consulter le dossier dans l'espace Stripe autorisé.
-          Aucun remboursement ni changement de commande n'est effectué ici.
+          consulter le dossier dans l'espace Stripe autorisé avant toute
+          décision. Une révision enregistrée ne déclenche aucun remboursement
+          ni changement de commande.
         </p>
       </div>
       {!session && (
@@ -106,6 +149,7 @@ function FinanceReviewsPage() {
           {loading?"Actualisation…":"Actualiser les événements"}
         </button>
       )}
+      {notice && <p role="status" className="mt-6 rounded-lg border border-border p-4 text-sm">{notice}</p>}
       {error && <p role="alert" className="mt-6 rounded-lg border border-destructive/40 p-4 text-sm text-destructive">{error}</p>}
       {reviews && reviews.length===0 && (
         <p role="status" className="mt-6 rounded-lg border border-border p-5 text-sm">
@@ -133,9 +177,48 @@ function FinanceReviewsPage() {
                   <dd>{review.amount_cents===null?"Non précisé":
                     (review.amount_cents/100).toLocaleString("fr-CA",{style:"currency",currency:"CAD"})}</dd></div>
               </dl>
+              <button type="button" disabled={saving}
+                onClick={() => {setSelected(review);setResolution("REVIEWED");setReason("");setError("");}}
+                className="mt-4 rounded-full border border-primary px-5 py-2 text-xs font-bold uppercase text-primary disabled:opacity-50">
+                Consigner une décision
+              </button>
             </article>
           ))}
         </div>
+      )}
+
+      {selected && (
+        <form onSubmit={saveReview} className="mt-7 rounded-2xl border border-primary/40 bg-card p-6">
+          <h2 className="text-xl font-semibold">Consigner la révision</h2>
+          <p className="mt-2 break-all text-sm text-muted-foreground">{selected.provider_event_id}</p>
+          <label htmlFor="finance-resolution" className="mt-5 block text-sm font-semibold">Décision administrative</label>
+          <select id="finance-resolution" value={resolution}
+            onChange={event => setResolution(event.target.value as "REVIEWED" | "DISMISSED")}
+            className="mt-2 w-full rounded-lg border border-input bg-background p-3 text-sm">
+            <option value="REVIEWED">Examiné dans Stripe</option>
+            <option value="DISMISSED">Classé sans action</option>
+          </select>
+          <label htmlFor="finance-review-reason" className="mt-5 block text-sm font-semibold">
+            Justification (10 à 500 caractères)
+          </label>
+          <textarea id="finance-review-reason" value={reason}
+            onChange={event => setReason(event.target.value)}
+            minLength={10} maxLength={500} rows={4} required
+            className="mt-2 w-full rounded-lg border border-input bg-background p-3 text-sm" />
+          <p className="mt-2 text-xs text-muted-foreground">
+            Cette opération met à jour le journal d'audit uniquement; aucune transaction Stripe n'est initiée.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button type="submit" disabled={saving || reason.trim().length < 10}
+              className="rounded-full bg-primary px-5 py-3 text-xs font-bold uppercase text-primary-foreground disabled:opacity-50">
+              {saving ? "Enregistrement…" : "Confirmer la décision"}
+            </button>
+            <button type="button" onClick={() => {setSelected(null);setReason("");}}
+              disabled={saving} className="rounded-full border border-border px-5 py-3 text-xs font-bold uppercase">
+              Annuler
+            </button>
+          </div>
+        </form>
       )}
     </main>
   );
