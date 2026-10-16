@@ -29,6 +29,7 @@ function OperationsPage() {
   const [reason,setReason] = useState("");
   const [notice,setNotice] = useState("");
   const [loading,setLoading] = useState(false);
+  const [refreshCount,setRefreshCount] = useState(0);
   const [failure,setFailure] = useState("");
 
   useEffect(() => {
@@ -67,7 +68,7 @@ function OperationsPage() {
     };
     void load();
     return () => { active=false; };
-  },[session, notice]);
+  },[session, refreshCount]);
 
   async function updateStatus(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -90,7 +91,7 @@ function OperationsPage() {
       if (!response.ok) throw new Error("Modification refusée. Vérifiez l'état du programme.");
       setNotice(editing.next === "CLOSED" ? "Séance fermée et journalisée." :
         "Séance rouverte et journalisée.");
-      setEditing(null);setReason("");
+      setEditing(null);setReason("");setRefreshCount(n=>n+1);
     } catch(error) {
       setFailure(error instanceof Error ? error.message : "Modification impossible.");
       setLoading(false);
@@ -121,7 +122,7 @@ function OperationsPage() {
       {failure && <p role="alert" className="mt-6 rounded-xl border border-destructive/50 p-4 text-sm text-destructive">{failure}</p>}
       {session && (
         <>
-          <button type="button" disabled={loading} onClick={() => setNotice("Actualisation demandée")}
+          <button type="button" disabled={loading} onClick={() => setRefreshCount(n=>n+1)}
             className="mt-6 inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-xs font-bold uppercase disabled:opacity-40">
             <RefreshCw size={16} aria-hidden/> Actualiser
           </button>
