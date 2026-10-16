@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "NITRO_PRESET=node-server vite build",
+    "build": "vite build",
     "build:dev": "vite build --mode development",
     "start": "node --env-file=.env .output/server/index.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build:node": "NITRO_PRESET=node-server vite build",
+    "build:vercel": "NITRO_PRESET=vercel vite build"
   },
   "overrides": {
     "rolldown": "1.2.1"

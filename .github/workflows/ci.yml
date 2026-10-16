@@ -32,7 +32,7 @@ jobs:
       - name: Payment readiness regression tests
         run: node --experimental-strip-types --test tests/payment-readiness.test.ts
       - name: Build server
-        run: npm run build
+        run: npm run build:node
 
       - name: Smoke test SSR and closed checkout
         shell: bash
@@ -64,3 +64,11 @@ jobs:
           status=$(curl --silent -o /dev/null -w '%{http_code}' -X POST \
             -H 'content-type: application/json' --data '{}' http://127.0.0.1:8080/api/stripe/webhook)
           [ "$status" = "503" ]
+
+      - name: Verify Vercel SSR build output
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run build:vercel
+          test -f .vercel/output/config.json
+          grep -q '"version"' .vercel/output/config.json

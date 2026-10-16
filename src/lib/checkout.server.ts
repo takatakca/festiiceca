@@ -92,7 +92,9 @@ export async function startCheckout(cart: Cart): Promise<string> {
     form.set("metadata[order_id]", order.order_id);
     form.set("success_url", base + "/billets?checkout=return");
     form.set("cancel_url", base + "/billets?checkout=cancelled");
-    form.set("expires_at", String(Math.floor(Date.now()/1000) + 30*60));
+    // Stripe requires at least 30 minutes at request receipt; use 35 minutes.
+    // Database holds capacity for 45 minutes to cover webhook delivery.
+    form.set("expires_at", String(Math.floor(Date.now()/1000) + 35*60));
     let i = 0;
     const add = (name: string, amount: number, quantity = 1) => {
       if (amount <= 0) return;
