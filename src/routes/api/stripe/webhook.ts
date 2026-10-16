@@ -35,23 +35,50 @@ export const Route = createFileRoute("/api/stripe/webhook")({
             "checkout.session.expired": "cancel",
             "checkout.session.async_payment_failed": "cancel",
           };
+          // Persist disputes and partial refunds for operator investigation.
+          // Never acknowledge a signed financial exception without a durable
+          // record, or Stripe will not retry during database outages.
+          if (event.type.startsWith("charge.dispute.")) {
+            const dispute = event.data?.object as {
+              payment_intent?: string | null;
+              amount?: number;
+            } | undefined;
+            const { recordFinancialReview } = await import("@/lib/checkout.server");
+            await recordFinancialReview(
+              event.id, event.type,
+              typeof dispute?.payment_intent === "string" ? dispute.payment_intent : null,
+              Number.isSafeInteger(dispute?.amount) ? dispute!.amount! : null,
+              "DISPUTE",
+            );
+            return Response.json({ received: true, manualReview: true });
+          }
           // A full Stripe refund revokes all associated QR tickets. Partial
-          // refunds require human assessment; do not void the entire order.
+          // refunds go into the durable manual-review queue. Do not void all
+          // tickets for a partial payment adjustment.
           if (event.type === "charge.refunded") {
             const charge = event.data?.object as (typeof event.data.object & {
               payment_intent?: string | null;
               amount?: number; amount_refunded?: number; refunded?: boolean;
               currency?: string;
             }) | undefined;
+            const { recordFinancialReview } = await import("@/lib/checkout.server");
             if (!charge || typeof charge.payment_intent !== "string" ||
                 charge.currency?.toLowerCase() !== "cad" ||
-                !Number.isSafeInteger(charge.amount) ||
+                !Number.isSafeInteger(charge.amount) || charge.amount! <= 0 ||
                 !Number.isSafeInteger(charge.amount_refunded)) {
-              console.error("[refund] unrecognized Stripe charge: manual review required");
+              await recordFinancialReview(
+                event.id, event.type,
+                typeof charge?.payment_intent === "string" ? charge.payment_intent : null,
+                Number.isSafeInteger(charge?.amount_refunded) ? charge!.amount_refunded! : null,
+                "UNRECOGNIZED_REFUND",
+              );
               return Response.json({ received: true, manualReview: true });
             }
             if (!charge.refunded || charge.amount_refunded !== charge.amount) {
-              console.error("[refund] partial refund: manual review required");
+              await recordFinancialReview(
+                event.id, event.type, charge.payment_intent,
+                charge.amount_refunded ?? null, "PARTIAL_REFUND",
+              );
               return Response.json({ received: true, manualReview: true });
             }
             const { recordFullRefund } = await import("@/lib/checkout.server");

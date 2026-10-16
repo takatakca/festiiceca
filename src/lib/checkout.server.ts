@@ -270,3 +270,28 @@ export async function recordFullRefund(
     throw new Error("Refund reconciliation pending");
   }
 }
+
+/**
+ * Persist a financial exception before acknowledging a signed Stripe event.
+ * This intentionally cannot modify tickets or initiate refunds.
+ */
+export async function recordFinancialReview(
+  eventId: string,
+  eventType: string,
+  paymentIntent: string | null,
+  amountCents: number | null,
+  category: "PARTIAL_REFUND" | "UNRECOGNIZED_REFUND" | "DISPUTE" | "OTHER",
+): Promise<void> {
+  if (!paymentProcessingConfigured()) throw new Error("Financial review unavailable");
+  const { error } = await database().rpc("record_financial_review", {
+    _event_id: eventId,
+    _event_type: eventType,
+    _payment_intent: paymentIntent,
+    _amount_cents: amountCents,
+    _category: category,
+  });
+  if (error) {
+    console.error("[stripe-review] durable review failure", error.code);
+    throw new Error("Financial review not persisted");
+  }
+}
