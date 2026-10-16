@@ -1,16 +1,19 @@
-# FESTI-ICE — Prioritized execution queue
-Updated: 2026-10-14. Mark items done only after observable verification.
+# FESTI-ICE — Prioritized task queue
 
-| Priority | State | Task | Completion proof |
-| --- | --- | --- | --- |
-| P0 | BLOCKED: authoritative project unknown | Determine which Supabase project is serving the active website. Verify migration history, RLS, grants, data and backups before writing. | Project ref, schema and migration checks documented without secrets. |
-| P0 | IN PROGRESS | Implement transactional Stripe checkout using server-validated DB ticket types, short-lived atomic holds, hosted payment redirect and webhook fulfillment. | Integration tests + Stripe test events + no oversell/idempotent ticket issuing. |
-| P0 | BLOCKED: Vercel 403 | Identify canonical domain and authorized target host (Vercel, MochaHost or Coolify/Contabo). | Host access, HTTPS, DNS, exact deploy SHA and rollback verified. |
-| P1 | TODO | QR ticket delivery, resend, cryptographically strong codes, duplicate scan protection and staff-specific auth. | End-to-end paid/test order, email received, scanner rejects second scan. |
-| P1 | TODO | Back office for seasons, sessions, slot capacity, ticket prices, operations, weather status, sales and refund handling. | Role-based write/read/deny test matrix. |
-| P1 | TODO | Improve public availability: server remaining capacity, near sellout, operational notices, no simulated programming. | DB-driven dates, slots, statuses. |
-| P2 | TODO | French/English complete UI, accessible focus/keyboard interactions and verified media optimization. | Mobile + accessibility acceptance. |
-| P2 | TODO | Lockfile reconciliation, formatting baseline, unit+integration+E2E CI and deployment pipeline. | Reproducible build and protected deploy. |
-| P2 | TODO | Analytics by opt-in, SEO review, transactional support policies and season lifecycle. | Production acceptance checklist. |
+Updated 2026-10-16. Tasks marked complete mean code/CI verification only when so specified; do not equate with paid integration acceptance.
 
-Avoid parallel duplicate work: claim a task in `WORKLOG.md` first. Never force-push. **No fictional success messages.**
+| Priority | State | Task and acceptance |
+| --- | --- | --- |
+| P0 | DONE in repo, CI validated | Patch TanStack XSS, align package versions and npm/Bun locks; run repeatable install, regression tests, Node + Vercel SSR builds. |
+| P0 | DONE at application build level | Repair Vercel framework/output settings. Verify deployment `dpl_8JqFuufvKAy9Jm7RZYmSgXr1Fojk` READY at SHA `0114b084`; confirm newer build separately. |
+| P0 | BLOCKED: authoritative DB unknown | Identify FESTI-ICE database `xsozkxcnjmyjjaorkxlx` or the actual backend from deployment environment without revealing credentials. Verify tables, migration versions, default grants, RLS and backups before migrations. Do not create a billable Supabase project. |
+| P0 | BLOCKED: payment integration | In approved isolated staging apply migrations, verify holds/replay/Stripe test payments and customer ticket email, plus webhook retries on paused sales. Only after approval allow actual sales. |
+| P0 | BLOCKED: domain ownership | Identify preferred domain `festiice.ca` or `festi-ice.ca`, map DNS and Vercel settings, remove/adjust protection only when authorized; verify HTTPS public responses and actual deployed SHA. |
+| P1 | PARTLY CODED | Test authorized scanner roles, successful and repeated QR scans and invalid tokens against DB in staging; enforce tenant-scoped TAKATAK identity rules if applicable. |
+| P1 | TODO | Operations dashboard for seasons, staff, events, capacity/prices, weather notices, ticket issuance, refunds and rescheduling. |
+| P1 | TODO | Paid-session expiration race, refund/reconciliation and email recovery with audit trail, webhook event persistence; verify Resend provider idempotency contract before launch. |
+| P1 | TODO | Integrate real operational capacity/status, final dates and copy from owner-approved sources; remove placeholders and inactive program concepts. |
+| P2 | TODO | User acceptance on tablets/mobile, accessibility, English localization, mail deliverability, security audit, privacy/legal policies. |
+| P2 | TODO | Normalize legacy Prettier formatting and add e2e, integration and stress tests without silencing code defects. |
+
+Continue from the earliest executable task. Document blockages, no speculative secrets, no fake checkout success or unverified production claims.

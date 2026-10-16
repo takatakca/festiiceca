@@ -65,3 +65,21 @@ Supabase project named FESTI ICE (`anyiaszbjsyrxfgjbwdt`). The latter
 was restored on 2026-10-14 and was empty (zero public tables) after
 restoration. Do not apply migrations to it or assign its URL as this
 application's production backend without confirming ownership and intent.
+
+## October 16, 2026 addendum
+
+The formerly broken automatic Vercel production-target deployment is now buildable:
+project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp`, framework `tanstack-start`,
+Node 24, `npm run build:vercel`, output auto-detected as Nitro Vercel SSR.
+The first confirmed READY build: `dpl_8JqFuufvKAy9Jm7RZYmSgXr1Fojk`
+at `0114b084633970aa0847eadc5b1beec9abe63feb`.
+
+TanStack Start has been upgraded to the CVE-2026-102989 patched version and both
+dependency lockfiles regenerated. The build command for self-hosted Coolify is
+`npm run build:node`, using `npm ci`. Source `vercel.json` is part of the
+repository. A dedicated health handler exists at `/api/health`.
+
+**Not yet production acceptance:** custom domain/SSO HTTPS accessibility,
+Stripe test/live end-to-end checks, correct Supabase DB schema and migrations,
+actual QR email / staff scan acceptance, weather and refund flows. Maintain
+`FESTIICE_CHECKOUT_ENABLED=false` until verified.

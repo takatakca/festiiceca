@@ -1,26 +1,30 @@
-# FESTI-ICE — Deployment runbook
-See also `PRODUCTION_RELEASE.md`.
+# FESTI-ICE — Deployment and operations
 
-## Application
-TanStack Start / Nitro Node SSR (React + Vite). Build: `npm run build`. Run: `node .output/server/index.mjs` with `PORT=8080`, `HOST=0.0.0.0`. A tested `Dockerfile.coolify` is present for off-host compilation; do not attempt heavy npm builds on constrained production hosting.
+**Updated:** 2026-10-16. Repo `takatakca/festiiceca`, branch `main`.
 
-## Environment selection
-- The registered GitHub main is source of truth.
-- **No target has been verified as production**. Previous Vercel team returned 403; do not claim deployment on the strength of a successful CI job.
-- Canonical domain **unresolved**: `festiice.ca` / `festi-ice.ca`. Do not silently redirect traffic until official DNS ownership/config is confirmed.
+## Hosting actually discovered
+- Vercel project ID `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp` under team `team_5evutKT6yGLTYxyLNsFfl1eH` (`takatakcas-projects`). GitHub pushes to `main` automatically trigger production-target deployments. No manual deployment is needed for normal commits.
+- Updated Vercel framework to `tanstack-start`, `buildCommand=npm run build:vercel`, install `npm ci --no-audit --no-fund`, Node 24, output auto-detected. `vercel.json` tracks corresponding repository configuration. SSR API must remain supported: no `dist` static-only configuration.
+- Latest confirmed READY: `dpl_8JqFuufvKAy9Jm7RZYmSgXr1Fojk` at SHA `0114b084633970aa0847eadc5b1beec9abe63feb`. Inspector: https://vercel.com/takatakcas-projects/festiiceca/8JqFuufvKAy9Jm7RZYmSgXr1Fojk
+- Vercel reported aliases `festiiceca.vercel.app`, `festiiceca-takatakcas-projects.vercel.app`, `festiiceca-git-main-takatakcas-projects.vercel.app`; protected by team SSO. Not proof that custom domain works.
+- Independent optional self-hosted Coolify/Contabo target: `Dockerfile.coolify` runs `npm ci`, `npm run build:node`; Node runtime `PORT=8080`, `HOST=0.0.0.0`. Not verified live on Coolify/MochaHost.
 
-## Server-only secrets
-`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `FESTIICE_CHECKOUT_ENABLED`, `FESTIICE_CANONICAL_ORIGIN`. Keep service/Stripe secrets in protected runtime settings and NEVER `VITE_*` variables or client bundles. Use separate Stripe test/live credentials and webhook endpoints. Never log raw customer/QR data.
+## Commands / CI
+- `npm ci --no-audit --no-fund`
+- `node --experimental-strip-types --test tests/payment-readiness.test.ts`
+- `npx eslint . --rule 'prettier/prettier: off'` (legacy baseline)
+- `npm run build:node` for Docker, `npm run build:vercel` for Vercel; GitHub CI verifies both and `.vercel/output/config.json`.
+- `/api/health` returns `{ok:true,service:"festiice",deploymentSha:<sha|null>}`. 200 proves HTTP application handler only, not upstream Stripe/database integration.
+- GitHub workflow `lockfile-sync.yml` automatically commits `bun.lock` and `package-lock.json` after manifest changes if installs/tests/build pass; no force pushes. Vercel Git integration deploys each `main` commit.
 
-## Release gates
-1. Confirm target identity, `main` SHA, correct Supabase project ref, migrated functions/RLS, backed-up DB, and current event calendar.
-2. Run `npm install`, semantic lint, `npm run build`; first reconcile `package-lock.json` for deterministic `npm ci`.
-3. Deploy to isolated preview environment (Coolify SSR image or verified Vercel target); set Stripe *test* secrets and `FESTIICE_CHECKOUT_ENABLED=false`.
-4. Verify `/`, `/billets`, status endpoints, CSP/HTTPS and 404/500 behaviors, then test Stripe Checkout and webhook receipt against an isolated test DB with realistic slots and duplicate events.
-5. Confirm no oversold slot, verified payment before QR issuance, customer email, staff scan and refund/weather behavior.
-6. Enable production only with operations approval, confirm exact deployed commit, smoke checks and rollback. Do not automatically activate ticket purchases through unrelated GitHub pushes.
+## Required production variables (protect secrets at Vercel; never paste values into Git)
+`FESTIICE_APPROVED_SUPABASE_PROJECT_REF` (actual reviewed Supabase project), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `FESTIICE_PAYMENT_MODE=test|live`, `FESTIICE_CANONICAL_ORIGIN`, `RESEND_API_KEY`, `FESTIICE_TICKET_FROM_EMAIL`. Set `FESTIICE_CHECKOUT_ENABLED=false` until staged positive paid-order, email, capacity and staff scan tests pass. When pausing sales, keep webhook fulfillment credentials so previously-paid orders can still complete.
 
-## Rollback
-Keep the previously working deployment artifact, roll application back using host deployment history. Revert DB changes only using reviewed additive migrations/forward fixes—never destroy paid orders or tickets. If checkout breaks, set `FESTIICE_CHECKOUT_ENABLED=false` immediately and investigate payment webhooks independently.
+## Launch and rollback gates
+1. Verify domain ownership/canonical origin (conflicting `festiice.ca` and `festi-ice.ca`) and DNS/SSL; protect staging with SSO, approve deliberate public access at the custom domain.
+2. Verify Supabase project ref in code versus connected account (not equal). Back up before applying/reviewing migrations and test RLS/RPC scopes.
+3. Test Stripe signatures, test payments, duplicate webhooks, expired hold race, refunds, payment-to-QR and delivery replays; staff-specific scanner tests.
+4. Confirm exact deploy SHA in `/api/health`, HTTPS GET `/` and `/billets`, no secrets in output, and rollback mechanism. A `READY` build alone is not proof of customer-facing launch.
+5. If errors occur, set checkout OFF; continue processing already-paid webhooks and reconcile unsettled orders. Roll back Vercel from its deployment history without destructively rolling back paid tickets/data.
 
-**Status: not deployed/verified during current session.**
+**Public website domain status:** not verified. **Vercel production-target build:** READY at `0114b084`. **Ticket sales:** not activated.
