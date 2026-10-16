@@ -45,3 +45,8 @@ Updated: 2026-10-16.
 26. Manual financial event review is NOT an actual Stripe refund, and never modifies ticket/ledger payment amounts. Only state `REVIEWED` or `DISMISSED` with a meaningful 10–500 character reason. Record the human administrator's subject ID and time; hold a row lock and never overwrite an already completed resolution on replay.
 27. The protected PATCH endpoint checks both the present Supabase JWT/ADMIN role and SQL-level actor role through a service_role-only RPC. A separate `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED` server flag remains false until the master TAKATAK entitlement/tenant bridge and authoritative database are verified. Browser request validation alone is not sufficient.
 28. Do not conflate a Vercel `READY` for an old SHA with a successful release of current code. No paid ticketing or financial-write enablement without a verified production environment and DNS.
+
+## Implementation verification and rollout — 2026-10-16
+
+29. `PATCH /api/operations/financial-reviews` is a proper TanStack Start server handler alongside GET. The SSR HTTP smoke test must prove write endpoint returns 503 while the `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED` flag is unset. This caught and resolved a real route registration error (latest verified app CI `38961413268`).
+30. The financial decision SQL is service-role only, uses an authenticated actor's admin role re-check, records reason/time/actor and refuses overwriting a resolved record. PostgreSQL validation `38961413271` is GREEN; live finance writes remain OFF and require central TAKATAK product authorization and canonical Supabase project.

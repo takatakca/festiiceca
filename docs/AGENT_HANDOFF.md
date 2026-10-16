@@ -38,3 +38,10 @@ GitHub code pushed, isolated CI checks run, Vercel last observed READY only for 
 
 ## Exact next action
 Fetch `main` commit and both CI job statuses; fix regressions if any. Check same-SHA Vercel READY, resolve authorized team access, attach verified official domain, GET public HTTPS `/api/health`. Determine authoritative Supabase backend and approved TAKATAK tenant/user mapping before applying migrations in a reviewed test environment; then verify Stripe/Resend/QR operational lifecycle. Finish and update this handoff after each authorized commit. No force pushes.
+
+## Validation and exact continuation after fixing route structure
+
+- Previous feature status in this handoff is superseded by: **commit `2499eba57510735679f4752740728260f725369c` app CI `38961413268` SUCCESS and disposable PostgreSQL CI `38961413271` SUCCESS**.
+- Root cause of intermediate app CI failures: PATCH handler was initially placed outside TanStack Start's `server.handlers` and then the server scope lacked a closing brace. Correct code now registers GET and PATCH inside `server.handlers` and parses/lints successfully. App smoke asserts `PATCH /api/operations/financial-reviews` responds 503 with feature flag off.
+- Vercel list last returned READY for **older** SHA `9e74fa87`, deployment `dpl_BtNDZxtMSu3HTvNdtV4Maj87wqpD`. No exact-SHA deployment or public domain verification for feature SHA. Previous authorized team create-deployment returned 403; do not claim success and do not bypass.
+- **Precise next action:** fetch newest GitHub main and both Actions results, verify Vercel Git deployment permission and current exact SHA, then public `/api/health` on approved canonical domain. Only after correctly identifying/authorizing Supabase master backend and TAKATAK entitlements may authorized personnel apply `20261016210000_financial_review_resolution.sql` and enable `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED` in a protected environment; payments remain disabled pending E2E. Update this handoff once more after completing a new task.

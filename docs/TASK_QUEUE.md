@@ -73,3 +73,10 @@ Continue from the earliest executable task. Document blockages, no speculative s
 | P0 | SAFE GATE OFF | Set `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=true` only after approved TAKATAK centralized product/tenant entitlement and right Supabase environment; do NOT enable now. |
 | P0 | UNVERIFIED RELEASE | Confirm a Vercel READY SHA matching latest `main`; previous deployment ready at `9e74fa87` only. Authorized custom domain + public HTTPS /api/health still unavailable. |
 | P0 | BLOCKED | Verify authoritative Supabase project, backup/migrations, Stripe/Resend test event lifecycle, staff role integration and canonical FESTI-ICE domain before operating real finance review writes or ticket sales. |
+
+## Final CI confirmation (2026-10-16)
+
+- [x] Fix nested TanStack server PATCH handler and verify app smoke/lint/build: `38961413268` success at `2499eba5`.
+- [x] Verify admin audit, reasons, role restrictions, replay, no money movement with PostgreSQL 17: `38961413271` success at `2499eba5`.
+- [ ] Re-establish authorized Vercel deployment of exact current main SHA; last listed READY is `9e74fa87` (old).
+- [ ] Resolve approved Supabase and TAKATAK central tenant entitlement, domain, Stripe/Resend and real QR lifecycle. Leave admin finance writes and sales disabled until validated.

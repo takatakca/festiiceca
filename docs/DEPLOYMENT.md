@@ -77,3 +77,10 @@ New migration, **not applied to any live Supabase project:** `20261016210000_fin
 `GET /api/operations/financial-reviews` remains restricted to ADMIN/SUPER_ADMIN. `PATCH` additionally requires `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=true` on the server, a verified Supabase project, same Origin, valid JWT, ADMIN/SUPER_ADMIN and a database re-check. The flag defaults OFF: do not configure it until the central TAKATAK entitlement bridge, correct tenant and authorized production credentials are tested.
 
 Vercel most recent observed READY `dpl_BtNDZxtMSu3HTvNdtV4Maj87wqpD` points to older `9e74fa87`. No latest-code/public `.ca` proof. To release: authorized Vercel team access, Git SHA match, public HTTPS `/api/health` match, then vendor E2E in an approved test environment.
+
+## Verified final implementation — 2026-10-16
+
+- **Last green feature commit:** `2499eba57510735679f4752740728260f725369c`. GitHub app CI run `38961413268` completed SUCCESS (semantic lint, all unit tests, Node SSR smoke including default-disabled PATCH, Vercel output build). PostgreSQL CI run `38961413271` completed SUCCESS (payment/QR/refund/manual-review integration, least-privilege checks).
+- Earlier commits `cb8fd28e`, `3b9e69ca`, `c385dc0d` had SSR handler registration/brace mistakes. Fixed correctly by `2499eba5`: PATCH is nested under `server.handlers` and both scopes close. Do not reinstate any failed route structure.
+- No source deployment to Vercel can be confirmed for `2499eba5`. The last listed READY remains `dpl_BtNDZxtMSu3HTvNdtV4Maj87wqpD` at older Git SHA `9e74fa87`; manual Vercel team deploy authorization previously returned HTTP 403. No official domain attached or public response verified.
+- Default-disabled config must remain: `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=false` (or absent), `FESTIICE_CHECKOUT_ENABLED=false`. No Supabase application migrations have been applied to a verified live environment, and no real financial transaction was tested.
