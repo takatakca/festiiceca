@@ -18,19 +18,27 @@ type Order = {
   flex_cents: number; lines: PriceLine[];
 };
 
-export function paymentConfigured(): boolean {
+/**
+ * Fulfillment must remain on when sales are paused: Stripe can deliver paid
+ * events long after the checkout button has been closed. Never couple the two.
+ */
+export function fulfillmentConfigured(): boolean {
   const env = process.env;
   const ref = env["FESTIICE_APPROVED_SUPABASE_PROJECT_REF"];
   const origin = env["FESTIICE_CANONICAL_ORIGIN"];
-  return env["FESTIICE_CHECKOUT_ENABLED"] === "true" &&
-    !!ref && /^[a-z0-9]{20}$/.test(ref) &&
-    !!origin && origin.startsWith("https://") &&
+  return !!ref && /^[a-z0-9]{20}$/.test(ref) &&
+    !!origin && /^https:\/\/[^/]+$/.test(origin) &&
     env["SUPABASE_URL"] === "https://" + ref + ".supabase.co" &&
     !!env["SUPABASE_SERVICE_ROLE_KEY"] &&
     !!env["SUPABASE_PUBLISHABLE_KEY"] &&
     !!env["STRIPE_SECRET_KEY"] && !!env["STRIPE_WEBHOOK_SECRET"] &&
     !!env["RESEND_API_KEY"] && !!env["FESTIICE_TICKET_FROM_EMAIL"] &&
     /^[^\s@]+@[^\s@]+$/.test(env["FESTIICE_TICKET_FROM_EMAIL"]);
+}
+
+export function paymentConfigured(): boolean {
+  return fulfillmentConfigured() &&
+    process.env["FESTIICE_CHECKOUT_ENABLED"] === "true";
 }
 
 function database() {
@@ -146,7 +154,7 @@ type StripeSession = {
 export async function settleCheckout(
   kind: "paid" | "cancel", session: StripeSession, eventId: string,
 ): Promise<void> {
-  if (!paymentConfigured()) throw new Error("Payments unavailable");
+  if (!fulfillmentConfigured()) throw new Error("Fulfillment unavailable");
   const orderId = session.metadata?.order_id;
   if (!orderId || orderId !== session.client_reference_id) throw new Error("Order mismatch");
   const db = database();
@@ -174,7 +182,7 @@ export async function settleCheckout(
 
 /** Email only issued QR tickets. Webhook retries recover a failed send. */
 export async function deliverOrderTickets(orderId: string): Promise<void> {
-  if (!paymentConfigured()) throw new Error("Ticket email not configured");
+  if (!fulfillmentConfigured()) throw new Error("Ticket email not configured");
   const db = database();
   const { data: order, error: orderError } = await db.from("orders")
     .select("order_number,customer_email,status,tickets_emailed_at")

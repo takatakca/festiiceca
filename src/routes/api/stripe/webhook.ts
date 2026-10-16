@@ -23,7 +23,10 @@ export const Route = createFileRoute("/api/stripe/webhook")({
     handlers: {
       POST: async ({ request }) => {
         const secret = process.env["STRIPE_WEBHOOK_SECRET"];
-        if (!secret || process.env["FESTIICE_CHECKOUT_ENABLED"] !== "true")
+        // Turning off new purchases must NEVER discard payment notifications
+        // for sessions that customers have already completed.
+        const { fulfillmentConfigured } = await import("@/lib/checkout.server");
+        if (!secret || !fulfillmentConfigured())
           return new Response("Not configured", { status: 503 });
         if (Number(request.headers.get("content-length") ?? "0") > 65536)
           return new Response("Too large", { status: 413 });
