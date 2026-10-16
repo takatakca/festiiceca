@@ -110,7 +110,7 @@ END $$;
 
 -- If Stripe successfully expired a newly-created Checkout session but its
 -- ID could not be persisted, release only the pending unlinked hold.
-DO $
+DO $$
 DECLARE v jsonb; v_id uuid; v_hold uuid;
 BEGIN
  v := public.create_checkout_order(
@@ -139,9 +139,9 @@ BEGIN
  THEN RAISE EXCEPTION 'incorrect session cancellation mutated order'; END IF;
  IF NOT public.cancel_checkout_order(v_id,'cs_actual_active') THEN
    RAISE EXCEPTION 'matching Checkout session not cancellable'; END IF;
-END $;
+END $$;
 
-DO $
+DO $$
 BEGIN
  IF has_function_privilege('anon',
   'public.create_checkout_order(uuid,jsonb,boolean,text,text,text,integer)','EXECUTE')
