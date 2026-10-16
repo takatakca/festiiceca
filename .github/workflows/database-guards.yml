@@ -70,3 +70,13 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016183000_secure_ticket_redemption.sql
       - name: Assert role, paid order, single scan and time-of-entry
         run: psql -v ON_ERROR_STOP=1 -f tests/sql/gate-assertions.sql
+      - name: Create isolated checkout transaction database
+        run: psql -v ON_ERROR_STOP=1 -c "CREATE DATABASE festiice_checkout_ci;"
+      - name: Bootstrap original ticketing schema dependencies
+        run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f tests/sql/checkout-integration-fixtures.sql
+      - name: Apply actual foundational checkout RPC migration
+        run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261014190000_checkout_transactional_foundation.sql
+      - name: Apply checkout session guards on original checkout RPC
+        run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016150000_checkout_session_guards.sql
+      - name: Assert paid order, replay, pricing, cancellation and capacity invariants
+        run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f tests/sql/checkout-integration-assertions.sql
