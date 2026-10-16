@@ -80,3 +80,7 @@ jobs:
         run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016150000_checkout_session_guards.sql
       - name: Assert paid order, replay, pricing, cancellation and capacity invariants
         run: PGDATABASE=festiice_checkout_ci psql -v ON_ERROR_STOP=1 -f tests/sql/checkout-integration-assertions.sql
+      - name: Apply durable financial exception ledger
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016193000_financial_event_review_ledger.sql
+      - name: Validate duplicate Stripe events and private manual reviews
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/financial-review-assertions.sql
