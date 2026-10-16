@@ -46,7 +46,14 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f tests/sql/checkout-guard-fixtures.sql
       - name: Apply checkout hardening migration
         run: |
-          psql -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN;"
+          psql -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN;"
           psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016150000_checkout_session_guards.sql
       - name: Run transactional checkout assertions
         run: psql -v ON_ERROR_STOP=1 -f tests/sql/checkout-guard-assertions.sql
+
+      - name: Bootstrap refund integration fixtures
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/refund-fixtures.sql
+      - name: Apply guarded full-refund migration
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016160000_stripe_full_refund_reconciliation.sql
+      - name: Verify full-refund idempotency and QR revocation
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/refund-assertions.sql
