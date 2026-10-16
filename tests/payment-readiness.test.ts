@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   fulfillmentConfigured,
   paymentConfigured,
+  paymentProcessingConfigured,
   type CheckoutEnvironment,
 } from "../src/lib/payment-readiness.ts";
 
@@ -53,4 +54,16 @@ test("invalid origins cannot activate checkout", () => {
   assert.equal(paymentConfigured({ ...base, FESTIICE_CANONICAL_ORIGIN: "http://festiice.ca" }), false);
   assert.equal(paymentConfigured({ ...base, FESTIICE_CANONICAL_ORIGIN: "https://festiice.ca/path" }), false);
   assert.equal(paymentConfigured({ ...base, FESTIICE_CANONICAL_ORIGIN: "https://festiice.ca?x=1" }), false);
+});
+
+test("paid events still process when email sending is unavailable", () => {
+  const mailOutage = { ...base, RESEND_API_KEY: undefined, FESTIICE_CHECKOUT_ENABLED: "false" };
+  assert.equal(paymentConfigured(mailOutage), false);
+  assert.equal(fulfillmentConfigured(mailOutage), false);
+  assert.equal(paymentProcessingConfigured(mailOutage), true);
+});
+
+test("no Stripe webhook signature or unapproved database rejects all payment events", () => {
+  assert.equal(paymentProcessingConfigured({ ...base, STRIPE_WEBHOOK_SECRET: undefined }), false);
+  assert.equal(paymentProcessingConfigured({ ...base, SUPABASE_URL: "https://wrong.supabase.co" }), false);
 });
