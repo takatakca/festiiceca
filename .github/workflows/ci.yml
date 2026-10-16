@@ -64,6 +64,11 @@ jobs:
           grep -q 'financiers\|financière\|financi' /tmp/festiice-finance.html
           status=$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/operations/financial-reviews)
           [ "$status" = "503" ]
+          # Financial review writes require an explicit server-side launch gate.
+          status=$(curl --silent -o /dev/null -w '%{http_code}' -X PATCH \
+            -H 'content-type: application/json' --data '{}' \
+            http://127.0.0.1:8080/api/operations/financial-reviews)
+          [ "$status" = "503" ]
           status=$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/operations/sessions)
           [ "$status" = "503" ]
           status=$(curl --silent -o /dev/null -w '%{http_code}' -X PATCH \

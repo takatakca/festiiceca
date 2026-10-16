@@ -129,7 +129,7 @@ function FinanceReviewsPage() {
       <div className="mt-5 flex items-start gap-3 rounded-xl border border-border p-4 text-sm">
         <AlertTriangle className="shrink-0 text-primary" aria-hidden/>
         <p>
-          Cette page est une liste en lecture seule. Pour traiter un litige,
+          Cette page permet de consigner une décision de révision. Pour traiter un litige,
           consulter le dossier dans l'espace Stripe autorisé avant toute
           décision. Une révision enregistrée ne déclenche aucun remboursement
           ni changement de commande.
