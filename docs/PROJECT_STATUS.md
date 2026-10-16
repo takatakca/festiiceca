@@ -34,3 +34,12 @@
 - The Vercel project variables inventory returned **no configured project environment variables** (only key names were inspected; no decrypted secrets). Do not open ticket sales or apply DB migrations as a consequence of the Vercel `READY` build.
 
 **Important:** The PostgreSQL fixtures are simplified proof of the *new guard and refund functions*, not an end-to-end test of all original Supabase migrations, Stripe settlement, email receipt, QR scan, or identity integration. Live production checkout remains **OFF / NOT ACCEPTED**.
+
+## New: operator-grade operational slot control (16 October 2026)
+
+- `src/routes/operations.tsx`: real responsive back-office for upcoming event sessions, authorizations via current staff session, visible publish/test/slot status, explicit close/reopen confirmation with 10-character minimum written reason. It never displays ticket purchaser contact data.
+- `src/routes/api/operations/sessions.ts`: GET/PATCH with checked Supabase JWT and the existing product's `user_roles`. Reading requires SUPERVISOR/OPERATIONS/ADMIN/SUPER_ADMIN; changes require OPERATIONS/ADMIN/SUPER_ADMIN. Server-only service role, CSRF Origin check on PATCH, strict Zod validation, and no untrusted user-defined Supabase queries.
+- `supabase/migrations/20261016170000_operational_slot_controls.sql`: privileged audited status transitions, PostgreSQL advisory lock shared with capacity holds, rejects reopening cancelled/advisory/demo/unpublished/outside-sale or elapsed slots. Dedicated audit table has RLS enabled with service-role-only grants.
+- `tests/sql/operations-fixtures.sql`, `tests/sql/operations-assertions.sql`, and updated CI workflow run actual PostgreSQL 17 checks (unauthorized gate staff, authorized close/open, audit idempotence, demo and invalid reason rejection). Successful build and DB test runs at commit `4ce8b291a941c606ef5b3c727987d5141b125081`; Vercel deployment `dpl_1H2dz3MCR2dFaQYCLpQy1SX6t66X` READY at exactly the same SHA.
+
+**Identity caveat:** The existing FESTI-ICE staff login and `user_roles` are local Supabase scaffolding. GROUPE TAKATAK's source of truth is central TAKATAK identity, enforced by product/tenant membership. The centralized entitlement bridge is NOT wired to FESTI-ICE. Do not activate privileged live operations or broaden roles until that mapping and authoritative DB environment are approved.

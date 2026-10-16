@@ -20,3 +20,9 @@ Updated: 2026-10-16.
 13. Public availability hides elapsed local Montréal slots and excludes active demo seasons, but PostgreSQL remains the authoritative source of booking eligibility.
 14. Signed Stripe `charge.refunded` with confirmed full refund and CAD amount reconciles payment status and revokes all associated QR tickets idempotently. Partial refunds/disputes are NOT auto-processed: manual review is required. This code does **not** initiate any Stripe refund.
 15. The isolated PostgreSQL 17 CI tests verify new SQL guards, not all historical schema migrations or paid integration. No live DB mutation until project mismatch resolved, backup checked and sandbox payment tests pass.
+
+## Operator security decisions — 16 October 2026
+
+16. Site operational control uses a private token-bearing API, not public client writes. The server validates Supabase JWT and product staff roles; PostgreSQL checks the actor's OPERATION/ADMIN/SUPER_ADMIN entitlement again inside its SECURITY DEFINER function; execute is revoked for anon/authenticated roles.
+17. A slot OPEN/CLOSED transition is serialized under the same advisory lock as capacity holds, requires 10–500 character reason and appends an audit row. No transition from CANCELLED/ADVISORY; reopening must pass season/event published, non-test and future-time checks. Duplicate no-op changes do not create duplicate audit records.
+18. GROUPE TAKATAK **central identity remains the intended authority**. Current local FESTI-ICE `user_roles` is legacy scaffolding, not a validated shared TAKATAK master identity/tenant grant. A signed and reviewed bridge is required before releasing operational role changes to public production.

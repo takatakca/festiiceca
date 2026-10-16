@@ -95,3 +95,13 @@ The related GitHub Action `database-guards.yml` runs their relevant
 SQL on a fresh throwaway PostgreSQL 17 fixture; it does **not** exercise
 a real Supabase or Stripe account. Keep sales OFF until real service
 authorization and integration tests are complete.
+
+## 2026-10-16 additional operations migration
+
+The service-role-only `20261016170000_operational_slot_controls.sql` follows
+checkout, session guards and full-refund migrations. It introduces the
+`slot_operational_audit` RLS-protected table and atomic slot status RPC.
+Only a verified staff/TAKATAK entitlement bridge and authorized production
+database may enable real `/operations` changes. The isolated PostgreSQL
+17 CI tests verify role denial, audit and reopening guard; they are NOT an
+authorized production staff login test.

@@ -37,3 +37,10 @@
 - The `FESTIICE_CHECKOUT_ENABLED` variable blocks **new** sales, not webhook settlement and refunds for previous orders. The payment processing readiness requirements exclude Resend availability; the email worker checks Resend separately and webhook returns a retryable response if ticket delivery fails.
 - Customer-readable time slots filter out session starts within five minutes of the server's Québec local clock, and the database hardening trigger independently validates the same cutoff.
 - Keep SSO protection until a public domain and DNS are authorized and verified. Query `/api/health` over the resulting HTTPS hostname; compare the returned SHA to GitHub and Vercel.
+
+## October 16 — operations module
+
+- Route `/operations` lists future dates/slots after an authorized staff login; direct `GET/PATCH /api/operations/sessions` rejects requests without approved Supabase project and server role. Writes require a verified operator role, Origin, approved status and reason, plus a transactional audit record.
+- New migration after checkout and refund migrations: `supabase/migrations/20261016170000_operational_slot_controls.sql`. Apply ONLY to the correctly identified and backed-up FESTI-ICE database.
+- Operational changes use the exact same PostgreSQL advisory slot lock as checkout holds. Reopening refuses elapsed, test/unpublished, non-active or out-of-sales-period sessions. Do not mutate production without full dedicated-role and TAKATAK entitlement verification.
+- `38943418966` GitHub application CI and `38943418754` database guard suite passed at `4ce8b291`; Vercel `dpl_1H2dz3MCR2dFaQYCLpQy1SX6t66X` READY with matching SHA. **No public domain or payment launch verified.**

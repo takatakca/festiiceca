@@ -29,3 +29,12 @@ Continue from the earliest executable task. Document blockages, no speculative s
 | P0 | Blocked: authoritative domain | Only SSO-protected Vercel aliases; choose domain `festiice.ca` or `festi-ice.ca` from approved owner records and verify public TLS/health response. |
 | P1 | Next independent code task | Build production-grade staff operations dashboard with server-checked role/tenant entitlements; review existing `user_roles` and TAKATAK identity authority before writing any privileged API. |
 | P1 | Test-gate pending | Verify Stripe payment -> ticket issuance -> Resend email -> QR scan -> full refund -> revoked ticket in isolated test mode. Include failures, webhook ordering and rate-limit contention. |
+
+## Updated after operational controls
+
+| Priority | State | Task |
+| --- | --- | --- |
+| P1 | CODED / CI PASS | `/operations` role-protected schedule viewer and audited OPEN/CLOSED change API; migration `20261016170000_operational_slot_controls.sql`. CI runs `38943418966` and `38943418754` green on `4ce8b291`. |
+| P0 | BLOCKED / IDENTITY | Replace local FESTI-ICE staff authentication authority with verified TAKATAK master identity and explicit `product=festiice`, client/tenant membership. Existing `user_roles` must not independently grant cross-product access. Do not guess or create an undocumented TAKATAK API. |
+| P0 | BLOCKED / INTEGRATIONS | Vercel missing real FESTI-ICE Supabase/Stripe/Resend variables, target Supabase project not verified and custom domain absent. Must prove successful authorized staff access and slot changes on isolated DB before enabling production operation. |
+| P1 | NEXT | Audit and implement weather advice/cancellations and rebooking, refunds/chargebacks and operational alerting; add staff activity review and client ticket resend with verified order ownership. |
