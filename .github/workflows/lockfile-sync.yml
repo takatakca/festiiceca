@@ -1,0 +1,80 @@
+name: Synchronize dependency locks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - package.json
+      - .github/workflows/lockfile-sync.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: festiice-lockfiles
+  cancel-in-progress: false
+
+jobs:
+  locks:
+    if: github.repository == 'takatakca/festiiceca'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: true
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+      - name: Setup pinned Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.1"
+      - name: Regenerate lockfiles from package.json
+        run: |
+          npm install --package-lock-only --no-audit --no-fund
+          bun install --lockfile-only
+      - name: Verify clean npm install
+        run: npm ci --no-audit --no-fund
+      - name: Verify patched Start and server transport
+        shell: bash
+        run: |
+          node --input-type=module <<'EOF'
+          import { createRequire } from 'node:module';
+          const require = createRequire(import.meta.url);
+          const start = require('@tanstack/react-start/package.json');
+          const core = require('@tanstack/start-server-core/package.json');
+          const version = s => s.split('.').map(Number);
+          const greaterOrEqual = (a, b) => {
+            const x = version(a), y = version(b);
+            return x[0] > y[0] || (x[0] === y[0] &&
+              (x[1] > y[1] || (x[1] === y[1] && x[2] >= y[2])));
+          };
+          if (!greaterOrEqual(start.version,'1.168.60') ||
+              !greaterOrEqual(core.version,'1.169.39'))
+            throw new Error('Vulnerable TanStack Start/server-core resolved');
+          console.log('Patched:', start.version, core.version);
+          EOF
+      - name: Semantic lint
+        run: "npx eslint . --rule 'prettier/prettier: off'"
+      - name: Unit tests
+        run: node --experimental-strip-types --test tests/payment-readiness.test.ts
+      - name: Build
+        run: npm run build
+      - name: Commit lockfile changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add package-lock.json bun.lock
+          if git diff --cached --quiet; then
+            echo "No lockfile changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(deps): synchronize npm and Bun locks after TanStack security patch"
+          # No force. If another agent updated main, leave the conflict for review.
+          git push origin HEAD:main
