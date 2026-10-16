@@ -129,5 +129,6 @@ export const Route = createFileRoute("/api/operations/financial-reviews")({
           return new Response("Review service unavailable", { status: 503 });
         }
       },
+    },
   },
 });
