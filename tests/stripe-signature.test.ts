@@ -48,6 +48,6 @@ test("rejects oversized request body, no secret and too many v1 digests", () => 
   assert.equal(verifyStripeSignature("x".repeat(65537), header(), secret, now), false);
   assert.equal(verifyStripeSignature(payload, header(), "", now), false);
   assert.equal(verifyStripeSignature(
-    payload, header() + ",v1=" + sign(payload, now).repeat(11), secret, now,
+    payload, header() + (",v1=" + sign(payload, now)).repeat(11), secret, now,
   ), false);
 });
