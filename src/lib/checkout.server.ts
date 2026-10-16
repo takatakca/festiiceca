@@ -4,8 +4,8 @@
  */
 import { createClient } from "@supabase/supabase-js";
 import QRCode from "qrcode";
-import { paymentConfigured, fulfillmentConfigured } from "./payment-readiness";
-export { paymentConfigured, fulfillmentConfigured } from "./payment-readiness";
+import { paymentConfigured, fulfillmentConfigured, paymentProcessingConfigured } from "./payment-readiness";
+export { paymentConfigured, fulfillmentConfigured, paymentProcessingConfigured } from "./payment-readiness";
 
 type Cart = {
   slotId: string;
@@ -256,7 +256,7 @@ export async function getPublishedRemainingCapacity(): Promise<Map<string, numbe
 export async function recordFullRefund(
   paymentIntent: string, eventId: string, amountCents: number,
 ): Promise<void> {
-  if (!fulfillmentConfigured()) throw new Error("Refund reconciliation unavailable");
+  if (!paymentProcessingConfigured()) throw new Error("Refund reconciliation unavailable");
   if (!paymentIntent.startsWith("pi_") || !eventId.startsWith("evt_") ||
       !Number.isSafeInteger(amountCents) || amountCents <= 0)
     throw new Error("Invalid refund event");
