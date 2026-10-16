@@ -57,3 +57,10 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016160000_stripe_full_refund_reconciliation.sql
       - name: Verify full-refund idempotency and QR revocation
         run: psql -v ON_ERROR_STOP=1 -f tests/sql/refund-assertions.sql
+
+      - name: Create restricted operations audit test fixtures
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/operations-fixtures.sql
+      - name: Apply operational slot controls
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016170000_operational_slot_controls.sql
+      - name: Verify role, audit and reopening restrictions
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/operations-assertions.sql
