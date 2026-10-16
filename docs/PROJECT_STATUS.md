@@ -22,3 +22,15 @@
 5. CI still excludes repository-wide legacy Prettier issues; semantic lint and builds run. Keep complete dependency lockfile and vulnerability checks on future updates.
 
 **Production sales: disabled / not validated. App production-target build: YES (Vercel READY), domain availability: UNVERIFIED.** See `TASK_QUEUE.md`.
+
+## 16 October 2026 — checkout hardening implementation
+
+- Added `tests/stripe-signature.test.ts`: HMAC v1 raw request body, 5-minute clock tolerance, altered-body/secret, malformed header, duplicate timestamp, oversize and replay rejection. Verified passing in GitHub Actions at `d1bdf44c`.
+- Added SQL migration `20261016150000_checkout_session_guards.sql`: before-insert checkout guard rejects sessions already started (5-minute buffer), demo seasons, closed/publication-disabled slots, sales outside season bounds and more than three pending unpaid orders per email within 20 minutes, with advisory-lock serialization. Tested against isolated PostgreSQL 17 in `.github/workflows/database-guards.yml`.
+- Public session list now hides elapsed local Montréal slots, demo seasons and displays checkout readiness only during valid season sales periods; pure slot-time tests added.
+- Added SQL migration `20261016160000_stripe_full_refund_reconciliation.sql`, `charge.refunded` webhook processing for *full refunds only*, idempotent payment ledger and QR revocation. Partial refunds explicitly require human review. Isolated database integration assertions were added and passed at commit `188ed274`.
+- Payment processing now remains enabled for already-paid webhook and refund events when Resend is temporarily unavailable; NEW checkout still requires operational Resend credentials and explicit sale enablement.
+- `main` at start of this follow-up was `ecb7622d`; latest feature implementation prior to this documentation update is `6da6786b65572def2f83eb630116bda869e0476f`. Multiple CI and Vercel revisions are automatically triggered and must be checked by SHA, not inferred from a prior green run.
+- The Vercel project variables inventory returned **no configured project environment variables** (only key names were inspected; no decrypted secrets). Do not open ticket sales or apply DB migrations as a consequence of the Vercel `READY` build.
+
+**Important:** The PostgreSQL fixtures are simplified proof of the *new guard and refund functions*, not an end-to-end test of all original Supabase migrations, Stripe settlement, email receipt, QR scan, or identity integration. Live production checkout remains **OFF / NOT ACCEPTED**.

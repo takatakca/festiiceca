@@ -3,7 +3,7 @@
 Newest first, one line per piece of work. Rule: `AGENTS.md` › Work log rule.
 Format: `YYYY-MM-DD | agent | branch → PR | status | what | next step`
 
-- 2026-10-16 | GPT-6 (checkout hardening) | main → direct | active | Audit/fix transactional ticket holds, Stripe webhook fulfillment, and reproducible regression checks; preserve fail-closed launch | run CI, verify Vercel SHA and update five handoff documents
+- 2026-10-16 | GPT-6 (checkout hardening) | main → direct | done (code and ephemeral CI; live payment blocked) | Tested Stripe signatures, session cutoff + anti-spam atomic DB guard, full-refund QR revocation, stale-slot public filtering and independent paid-event processing during mail outages; all pushed | confirm latest SHA/CI/Vercel READY; identify authentic Supabase project and canonical domain; test payment+email+scanner on approved isolated service before opening sales
 
 - 2026-10-16 | GPT-6 (GitHub/Vercel) | main → direct | done: critical deployment fixes; blocked: public domain and checkout acceptance | Separated paid webhook fulfillment from sales switch, added readiness regression tests, fixed CVE-2026-102989 TanStack dependencies, regenerated npm/Bun lockfiles, fixed Vercel SSR preset/config, obtained READY deploy at 0114b084, added /api/health at dd5e65e1; docs refreshed | confirm newest CI/deploy SHA, public custom DNS and HTTPS, verify authoritative Supabase project and staged real Stripe/Resend/scanner tests before opening sales
 

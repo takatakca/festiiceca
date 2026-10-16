@@ -17,3 +17,15 @@ Updated 2026-10-16. Tasks marked complete mean code/CI verification only when so
 | P2 | TODO | Normalize legacy Prettier formatting and add e2e, integration and stress tests without silencing code defects. |
 
 Continue from the earliest executable task. Document blockages, no speculative secrets, no fake checkout success or unverified production claims.
+
+## October 16 follow-up: next executable checkpoints
+
+| Priority | Status | Evidence / exact follow-up |
+| --- | --- | --- |
+| P0 | Implemented; PostgreSQL CI green | New `20261016150000_checkout_session_guards.sql` blocks expired/demo/off-sale sessions and excessive unpaid reservations. Run with real checkout RPC on a verified isolated Supabase clone before production. |
+| P0 | Implemented; PostgreSQL CI green | New `20261016160000_stripe_full_refund_reconciliation.sql` revokes QR on signed full refund; replay/idempotence fixture tested. Extend to partial refunds, disputes and explicit manual-review queue. |
+| P0 | Implemented; JS CI green | Stripe signature/time tests and public stale-session filters. Confirm on the latest branch commit after all CI jobs conclude. |
+| P0 | Blocked: no approved production credentials | Vercel project `festiiceca` lists zero configured project variables. Identify the real database `xsozkxcnjmyjjaorkxlx` and validated Stripe/Resend configurations; do not create billable Supabase projects. |
+| P0 | Blocked: authoritative domain | Only SSO-protected Vercel aliases; choose domain `festiice.ca` or `festi-ice.ca` from approved owner records and verify public TLS/health response. |
+| P1 | Next independent code task | Build production-grade staff operations dashboard with server-checked role/tenant entitlements; review existing `user_roles` and TAKATAK identity authority before writing any privileged API. |
+| P1 | Test-gate pending | Verify Stripe payment -> ticket issuance -> Resend email -> QR scan -> full refund -> revoked ticket in isolated test mode. Include failures, webhook ordering and rate-limit contention. |

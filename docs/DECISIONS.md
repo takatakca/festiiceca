@@ -12,3 +12,11 @@ Updated: 2026-10-16.
 8. Staff scanning only with verified Supabase JWT and explicit user role; preserve strict merchant data separation, no service-role key on public UI.
 9. Security advisor on the connected but not authorized FESTI ICE project flagged public `SECURITY DEFINER public.rls_auto_enable()`; review after identifying correct target, do not blindly run DDL.
 10. Formatting debt: CI temporarily disables legacy Prettier rule; lint, native regression tests, SSR smoke, Vercel artifact check remain required before new releases.
+
+## 2026-10-16 security / operations addenda
+
+11. Paid event receipt must be independent of email provider availability. New sales require successful email configuration, but signed Stripe paid/refunded events continue to reconcile records when email is down. A failed customer ticket email should receive a retryable webhook response.
+12. New `PENDING_PAYMENT` order inserts fail closed when the selected session has already started/within five minutes, when season/event is demo or closed/outside approved sale window, or when a normalized email address has >=3 pending reservations in the preceding 20 minutes. The SQL before-insert guard runs atomically in the checkout transaction, and uses transaction advisory locks; public API roles cannot execute its trigger function.
+13. Public availability hides elapsed local Montréal slots and excludes active demo seasons, but PostgreSQL remains the authoritative source of booking eligibility.
+14. Signed Stripe `charge.refunded` with confirmed full refund and CAD amount reconciles payment status and revokes all associated QR tickets idempotently. Partial refunds/disputes are NOT auto-processed: manual review is required. This code does **not** initiate any Stripe refund.
+15. The isolated PostgreSQL 17 CI tests verify new SQL guards, not all historical schema migrations or paid integration. No live DB mutation until project mismatch resolved, backup checked and sandbox payment tests pass.

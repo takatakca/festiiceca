@@ -28,3 +28,12 @@
 5. If errors occur, set checkout OFF; continue processing already-paid webhooks and reconcile unsettled orders. Roll back Vercel from its deployment history without destructively rolling back paid tickets/data.
 
 **Public website domain status:** not verified. **Vercel production-target build:** READY at `0114b084`. **Ticket sales:** not activated.
+
+## 2026-10-16 follow-up — dependency and security gates
+
+- The Vercel project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp` has no project-level environment keys configured according to its inspected inventory (values were not decrypted). A Vercel `READY` SSR build cannot execute a live paid checkout without trusted Supabase/Stripe/Resend settings.
+- Hardened Stripe signature tests execute within `FESTI-ICE CI` and SQL-specific checkout/refund tests execute in ephemeral PostgreSQL 17 (`.github/workflows/database-guards.yml`).
+- Migration order after verified project identification, backup and review: existing `20261014190000_checkout_transactional_foundation.sql`, then `20261016150000_checkout_session_guards.sql`, then `20261016160000_stripe_full_refund_reconciliation.sql`. All remain unapplied to production.
+- The `FESTIICE_CHECKOUT_ENABLED` variable blocks **new** sales, not webhook settlement and refunds for previous orders. The payment processing readiness requirements exclude Resend availability; the email worker checks Resend separately and webhook returns a retryable response if ticket delivery fails.
+- Customer-readable time slots filter out session starts within five minutes of the server's Québec local clock, and the database hardening trigger independently validates the same cutoff.
+- Keep SSO protection until a public domain and DNS are authorized and verified. Query `/api/health` over the resulting HTTPS hostname; compare the returned SHA to GitHub and Vercel.

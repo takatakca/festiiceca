@@ -83,3 +83,15 @@ repository. A dedicated health handler exists at `/api/health`.
 Stripe test/live end-to-end checks, correct Supabase DB schema and migrations,
 actual QR email / staff scan acceptance, weather and refund flows. Maintain
 `FESTIICE_CHECKOUT_ENABLED=false` until verified.
+
+## Pending checkout migrations — 16 October 2026
+
+After identifying and backing up the actual FESTI-ICE Supabase project,
+review/apply the additive checkout security migrations in numeric order:
+`20261016150000_checkout_session_guards.sql` and
+`20261016160000_stripe_full_refund_reconciliation.sql`. These require
+`20261014190000_checkout_transactional_foundation.sql` first.
+The related GitHub Action `database-guards.yml` runs their relevant
+SQL on a fresh throwaway PostgreSQL 17 fixture; it does **not** exercise
+a real Supabase or Stripe account. Keep sales OFF until real service
+authorization and integration tests are complete.
