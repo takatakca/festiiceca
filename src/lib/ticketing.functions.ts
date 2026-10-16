@@ -10,6 +10,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { TicketType } from "@/lib/festi-data";
+import { isBookableSession } from "@/lib/slot-availability";
 
 export type PublicTicketing = {
   dates: { date: string; slots: { id: string; startTime: string; remaining: number }[] }[];
@@ -42,19 +43,27 @@ export const getPublicTicketing = createServerFn({ method: "GET" }).handler(
       });
       const season = await supabase
         .from("seasons")
-        .select("id")
+        .select("id, sales_start_at, sales_end_at")
         .eq("is_active", true)
+        .eq("is_demo", false)
+        .eq("status", "ACTIVE")
         .limit(1)
         .maybeSingle();
       if (season.error || !season.data) return EMPTY;
 
-      // Québec local date, not UTC (the event is in Maricourt).
-      const today = new Date().toLocaleDateString("en-CA", {
+      // Use a consistent Montréal-local clock for dates and time slots.
+      // A five-minute buffer also matches the database checkout guard.
+      const cutoffLocal = new Intl.DateTimeFormat("sv-SE", {
         timeZone: "America/Toronto",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        hour12: false,
+      }).format(new Date(Date.now() + 5 * 60 * 1000));
+      const today = cutoffLocal.slice(0, 10);
+      const now = new Date().toISOString();
+      const salesOpen =
+        (!season.data.sales_start_at || season.data.sales_start_at <= now) &&
+        (!season.data.sales_end_at || season.data.sales_end_at >= now);
 
       const [dateResult, priceResult] = await Promise.all([
         supabase
@@ -101,13 +110,16 @@ export const getPublicTicketing = createServerFn({ method: "GET" }).handler(
       const capacity = await getPublishedRemainingCapacity();
       const flex = prices.find((p) => p.code === "FLEX_WEATHER" && p.is_addon);
       return {
-        checkoutEnabled: paymentConfigured() && eventDates.some((date) =>
+        checkoutEnabled: salesOpen && paymentConfigured() && eventDates.some((date) =>
           (slotResult?.data ?? []).some((slot) => slot.event_date_id === date.id &&
-            (capacity.get(slot.id) ?? 0) > 0)),
+            (capacity.get(slot.id) ?? 0) > 0 &&
+            isBookableSession(date.event_date, slot.start_time, cutoffLocal))),
         dates: eventDates.map((d) => ({
           date: d.event_date,
           slots: (slotResult?.data ?? [])
-            .filter((slot) => slot.event_date_id === d.id && (capacity.get(slot.id) ?? 0) > 0)
+            .filter((slot) => slot.event_date_id === d.id &&
+              (capacity.get(slot.id) ?? 0) > 0 &&
+              isBookableSession(d.event_date, slot.start_time, cutoffLocal))
             .map((slot) => ({ id: slot.id, startTime: slot.start_time, remaining: capacity.get(slot.id)! })),
         })),
         ticketTypes: prices.filter((p) => !p.is_addon).map((p) => ({
