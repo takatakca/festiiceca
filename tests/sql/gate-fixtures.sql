@@ -13,8 +13,9 @@ CREATE UNIQUE INDEX gate_test_qr_unique ON public.tickets(qr_token);
 UPDATE public.tickets SET
  qr_token = repeat('f',64),
  time_slot_id = '00000000-0000-0000-0000-000000000003'
-WHERE id = (SELECT min(id) FROM public.tickets
-            WHERE order_id='00000000-0000-0000-0000-000000000010');
+WHERE id = (SELECT id FROM public.tickets
+            WHERE order_id='00000000-0000-0000-0000-000000000010'
+            ORDER BY id LIMIT 1);
 
 -- One paid/issued order for the current Montréal day.
 UPDATE public.event_dates SET event_date =
