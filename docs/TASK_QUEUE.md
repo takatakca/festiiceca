@@ -38,3 +38,14 @@ Continue from the earliest executable task. Document blockages, no speculative s
 | P0 | BLOCKED / IDENTITY | Replace local FESTI-ICE staff authentication authority with verified TAKATAK master identity and explicit `product=festiice`, client/tenant membership. Existing `user_roles` must not independently grant cross-product access. Do not guess or create an undocumented TAKATAK API. |
 | P0 | BLOCKED / INTEGRATIONS | Vercel missing real FESTI-ICE Supabase/Stripe/Resend variables, target Supabase project not verified and custom domain absent. Must prove successful authorized staff access and slot changes on isolated DB before enabling production operation. |
 | P1 | NEXT | Audit and implement weather advice/cancellations and rebooking, refunds/chargebacks and operational alerting; add staff activity review and client ticket resend with verified order ownership. |
+
+## New queue checkpoint — QR and signed financial events
+
+| Priority | State | Specific work |
+| --- | --- | --- |
+| P0 | DONE in code; ephemeral DB PASS | Secure QR admission on paid booked day only, atomic order/ticket locks, role and revoked-status checks, tests plus tightened gateway HTTP smoke. |
+| P0 | DONE in code; ephemeral DB PASS | Foundation checkout migration integrated with test schema; assert holds, real totals, paid QR issuance, Stripe event replay and capacity. No live Stripe account was used. |
+| P1 | DONE in code; ephemeral DB PASS | Durable signed Stripe partial-refund/dispute review ledger + admin-only read API and standalone read-only dashboard; ensure full real backend migration and role review before use. |
+| P0 | BLOCKED | Resolve actual Supabase project, owner-approved tenant and TAKATAK product entitlement, domain, Vercel environment secrets and real Stripe/Resend event testing. |
+| P0 | NEEDS VERIFICATION | For latest `main` SHA, verify both GitHub Actions and matching Vercel production-target READY; publicly check HTTPS `/api/health` only after canonical domain set. |
+| P1 | TODO | Reliable webhook delivery recovery and reconciliation after retry window, partial-refund staff state/audit, chargebacks, weather/rescheduling and explicit customer ticket resend by verified owner. |

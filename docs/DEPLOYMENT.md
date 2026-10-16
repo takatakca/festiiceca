@@ -44,3 +44,14 @@
 - New migration after checkout and refund migrations: `supabase/migrations/20261016170000_operational_slot_controls.sql`. Apply ONLY to the correctly identified and backed-up FESTI-ICE database.
 - Operational changes use the exact same PostgreSQL advisory slot lock as checkout holds. Reopening refuses elapsed, test/unpublished, non-active or out-of-sales-period sessions. Do not mutate production without full dedicated-role and TAKATAK entitlement verification.
 - `38943418966` GitHub application CI and `38943418754` database guard suite passed at `4ce8b291`; Vercel `dpl_1H2dz3MCR2dFaQYCLpQy1SX6t66X` READY with matching SHA. **No public domain or payment launch verified.**
+
+## 2026-10-16 — Gateway and financial exception migrations
+
+After the correctly identified database is backed up and prior migrations are present, review and apply in order:
+`20261016183000_secure_ticket_redemption.sql` then
+`20261016193000_financial_event_review_ledger.sql`.
+The first refuses any scanner token unless the authenticated actor has an approved staff role, order is paid, ticket is active and today's Montréal local date matches the purchased open session; locks align with full-refund transaction. Public roles cannot execute the RPC. The second introduces an RLS-protected private ledger of signed Stripe disputes, partial refunds and unknown refund events with durable idempotence.
+
+The authorized operator can read exceptions at `/operations/reviews` via an ADMIN/SUPER_ADMIN-only API. The page has no action to refund customers. Current Vercel production variables and the real Supabase identity/project have NOT been verified: application build success does not make finance or scanning live.
+
+`database-guards.yml` now runs (1) the original legacy-style fixtures with QR/finance hardening, and (2) a **second isolated Postgres database** applying the actual foundation checkout RPC migration, then transaction tests of pricing, holds, paid QR issuance, replay, cancellation and capacity. Both do not touch real production or Supabase.

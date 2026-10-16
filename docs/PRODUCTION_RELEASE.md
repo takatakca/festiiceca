@@ -105,3 +105,16 @@ Only a verified staff/TAKATAK entitlement bridge and authorized production
 database may enable real `/operations` changes. The isolated PostgreSQL
 17 CI tests verify role denial, audit and reopening guard; they are NOT an
 authorized production staff login test.
+
+## Additional prelaunch financial and gate migrations (2026-10-16)
+
+Only after confirmed production database ref, verified backup and isolated full
+lifecycle testing, apply the gate migration
+`20261016183000_secure_ticket_redemption.sql`, followed by
+`20261016193000_financial_event_review_ledger.sql`. Database CI now tests
+the base checkout migration in a second throwaway PostgreSQL 17 database,
+including pgcrypto from `extensions` (matching Supabase extension layout).
+The private review dashboard `/operations/reviews` is read-only and requires
+finance admin permission. No active payments or refunds were created in these
+offline tests. Any Vercel `READY` claim must be paired with the exact source
+commit and an independent HTTPS domain check.

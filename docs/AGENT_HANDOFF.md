@@ -1,48 +1,40 @@
-# FESTI-ICE — Latest agent handoff
+# FESTI-ICE — Agent handoff
 
 **Updated:** 2026-10-16, America/Toronto.
-**Repo:** `takatakca/festiiceca`; default/publish branch: `main`.
-**Last feature commit pushed:** `4ce8b291a941c606ef5b3c727987d5141b125081`.
-**Final handoff commit:** newest `main` commit containing this document.
-**Last completed task:** operational dashboard, secured session-management API, database audit of OPEN/CLOSED actions, and CI smoke + PostgreSQL tests.
-**Task in progress:** verify `main` release and central TAKATAK identity/tenant mapping and correct FESTI-ICE backend; full financial integration still pending authorization.
+**Repo and branch:** `takatakca/festiiceca` / `main`. GitHub default branch, no open PRs or issues at start of this session.
+**Previous final SHA:** `66d858b0cf1392135630e16c42d3b01b82db9932`.
+**Last feature commit before final documentation:** `cd56a5342917176b1d11ecfa1cd7451c2bf26bb5`. Check `main` for the final handoff SHA.
+**Last completed task:** harden paid QR admission, integrate the real foundational checkout SQL into isolated PostgreSQL CI, and add a durable finance manual-review ledger + restricted dashboard.
+**Current task:** reconcile actual Supabase project and master TAKATAK entitlement, verify Vercel deployment for final `main` SHA, then run real payment/email/scanner test end to end.
 
-## Actual files modified this session
+## Files touched in current session
+- `WORKLOG.md`; `supabase/migrations/20261016183000_secure_ticket_redemption.sql`; `tests/sql/gate-fixtures.sql`; `tests/sql/gate-assertions.sql`.
+- `tests/sql/checkout-integration-fixtures.sql`, `tests/sql/checkout-integration-assertions.sql`; `.github/workflows/database-guards.yml`, `.github/workflows/ci.yml`.
+- `supabase/migrations/20261016193000_financial_event_review_ledger.sql`; `src/lib/checkout.server.ts`, `src/routes/api/stripe/webhook.ts`, `tests/sql/financial-review-assertions.sql`.
+- `src/routes/api/operations/financial-reviews.ts`, `src/routes/operations_/reviews.tsx`, `src/routes/operations.tsx`.
+- The five required docs, `docs/PRODUCTION_RELEASE.md` and this log.
 
-Prior security/capacity/payment commits:
-- `src/lib/stripe-signature.ts`; `tests/stripe-signature.test.ts`; `src/routes/api/stripe/webhook.ts`.
-- `src/lib/payment-readiness.ts`, `src/lib/checkout.server.ts`, `tests/payment-readiness.test.ts`.
-- `src/lib/ticketing.functions.ts`, `src/lib/slot-availability.ts`, `tests/slot-availability.test.ts`.
-- `supabase/migrations/20261016150000_checkout_session_guards.sql`, `20261016160000_stripe_full_refund_reconciliation.sql`.
-- `tests/sql/checkout-guard-*.sql`, `tests/sql/refund-*.sql`, `.github/workflows/database-guards.yml`, `.github/workflows/ci.yml`.
+## Work/verification evidence
+- Read `AGENTS.md`, `WORKLOG.md`, previous `docs/AGENT_HANDOFF.md` and `TASK_QUEUE.md`, GitHub branch/commits/tree, open PRs/issues and deployment status before editing.
+- `38955176208` database guard tests passed after fixture correction; `38955646908` passed with `pgcrypto` in the Supabase-style `extensions` schema.
+- `38956038605` ledger tests succeeded.
+- Latest verified feature `cd56a534`: **GitHub Actions application CI `38956304449` SUCCESS and PostgreSQL database guard CI `38956304352` SUCCESS.** The latter exercises original `20261014190000` checkout RPCs, new QR gate and financial exception ledger.
+- Vercel auto-deploy still connected to `main`: previous READY at `dpl_HGJMfSNBZnrYWuHhoyAiumDgQgxx` / commit `41871005`; **a later matching READY SHA was not visible when documentation started**. Re-query before declaring new delivery.
+- Direct HTTPS inspection of `https://festiice.ca` and `https://festi-ice.ca` did not establish a response. Vercel aliases are protected by team SSO; no verified public custom domain.
+- No Stripe transaction, Resend email, authorized Supabase migration or production database writes were performed.
 
-Operations work:
-- `supabase/migrations/20261016170000_operational_slot_controls.sql`.
-- `src/routes/api/operations/sessions.ts`, `src/routes/operations.tsx`.
-- `tests/sql/operations-fixtures.sql`, `tests/sql/operations-assertions.sql`.
-- `docs/PROJECT_STATUS.md`, `docs/TASK_QUEUE.md`, `docs/AGENT_HANDOFF.md`, `docs/DEPLOYMENT.md`, `docs/DECISIONS.md`, `docs/PRODUCTION_RELEASE.md`, `WORKLOG.md`.
+## Current blockers (do not disguise them)
+1. The actual FESTI-ICE source database ID is unknown. Repo `supabase/config.toml` has `xsozkxcnjmyjjaorkxlx`; connected Supabase named project `anyiaszbjsyrxfgjbwdt` is separate, with no app schema. **Do not migrate to it blindly or create billable projects.**
+2. Vercel project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp` lacked inspected production environment variable keys for approved Supabase, Stripe, and Resend. Checkout sales must remain disabled.
+3. GROUPE TAKATAK central identity and tenant-scoped `festiice` entitlement are not integrated. Current app `user_roles` and local Supabase OTP are not sufficient to grant live cross-product rights; no production staff authorization claimed.
+4. Domain `festiice.ca` versus `festi-ice.ca` unconfirmed, SSO and DNS unresolved. No public HTTP 200 verified.
+5. Stripe refunds and disputes are now durably recorded, but partial refund resolution, staff action logging, chargeback handling and scheduled reconciliation remain incomplete. Email delivery and QR scanner are not tested against actual configured vendors.
+6. Full migrations are not run against real Supabase, and cross-tenant/paid order E2E not accepted. Ephemeral PostgreSQL 17 tests are valuable but NOT proof of live financial integration.
 
-## Commands/verifications actually executed
+## Deployment state and required access
+- App GitHub code is pushed. The last confirmed READY Vercel deployment is for `41871005`, not the current feature SHA. Auto deployment may produce newer builds. Confirm with the Vercel connector and source SHA.
+- Need verified Supabase backend ref with migration and backup authority, TAKATAK master product membership mapping, approved official domain/DNS, and protected Stripe test/Resend sender credentials. Never print secret values.
+- Sale switch `FESTIICE_CHECKOUT_ENABLED` stays OFF. Pausing sales must NOT stop existing paid webhook settlement/refunds.
 
-- Queried GitHub main, commits, open PRs/issues (none), file contents and Actions results; respected `AGENTS.md` no-force policy.
-- GitHub `38943418966`: `npm ci`, semantic ESLint, all native Node payment/signature/slot tests, Node SSR build and smoke (`/`, `/billets`, `/personnel`, `/operations`, closed payment/webhook and unauthorized operations API), Vercel SSR output build: **success** at `4ce8b291`.
-- GitHub `38943418754`: disposable PostgreSQL 17 initialized, applied checkout guard, full refund and operational migrations to isolated schemas, asserted closure/reopen, role denial, operational audit and full refund idempotency: **success** at `4ce8b291`.
-- Vercel project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp` automatic production-target `dpl_1H2dz3MCR2dFaQYCLpQy1SX6t66X`: **READY** for `4ce8b291`, inspected via connected Vercel tool. Other commits follow via Git integration; check exact SHA after this doc commit.
-- No verified HTTPS response at canonical site; team SSO protects listed Vercel aliases and custom domain is not attached.
-- Vercel inspected project-level env inventory had **no keys**, and no secrets were decrypted.
-- **NO mutations to live Supabase**; named connected `FESTI ICE` database `anyiaszbjsyrxfgjbwdt` has no app tables/migrations whereas `supabase/config.toml` points at `xsozkxcnjmyjjaorkxlx`.
-
-## Blockers / errors / access required
-
-1. Critical: authoritative FESTI-ICE Supabase project ref and backup. Do not apply migrations to the other similarly named empty project or create a billable project.
-2. GROUPE TAKATAK centralized login and product entitlement must be integrated. The current front-end Supabase Auth and product's `user_roles` are **not proof** of central TAKATAK permission. Reference the master repository `takatakca/takatak-v1`, especially `docs/TAKATAK_V1_TENANT_ISOLATION_AUDIT.md` and `docs/RENTAUTO_SHARED_BACKEND_CUTOVER.md`. Avoid using master private tables or copying identities without an approved connector contract.
-3. No Stripe test/live webhook credentials, approved Resend sender, operating calendar, tax/refund policy or signed-off payment/QR scanner E2E. New-sale flag remains OFF; retain existing-paid webhook handling even during sales/mail outage.
-4. No confirmed public domain ownership/canonical domain: `festiice.ca` versus `festi-ice.ca`. Vercel SSO aliases aren't customer-accessible without authorization. Do not alter DNS/SSO without approval.
-5. Partial Stripe refunds and disputes currently require human review. Email, real role-scope, load tests, accessibility/localization and anti-spam beyond normalized customer email still incomplete.
-6. Tests in GitHub used disposable PostgreSQL fixture schemas and do not prove application migrations on real Supabase or actual Stripe/Resend payments.
-
-## Real deployment / next action
-
-- **Vercel production-target build:** READY at `4ce8b291`. Not a validated public website or ticketing launch. New release is automatically triggered by changes on `main`.
-- **Sale status:** OFF and intentionally unverified.
-- **Next action precisely:** Read `AGENTS.md`, `WORKLOG.md`, this handoff and queue; fetch current main SHA and verify green app+DB CI and Vercel READY at that exact SHA. Then audit the TAKATAK V1 identity contract, determine the authorized FESTI-ICE backend and approved canonical domain, and perform isolated full paid/QR/refund/operator E2E before enabling any production sale or operational write. Continue with weather/rebooking and safe customer ticket resend while integrations are pending. Update this file in final commit.
+## Exact next action for the next agent
+Read `AGENTS.md`, `WORKLOG.md` and this handoff; fetch current `main` SHA, CI runs and Vercel project deployments. Repair failed CI if any and confirm same-SHA Vercel READY; verify HTTPS health on the approved public domain. Identify the correct Supabase project before touching migrations; conduct an authorized isolated payment-to-email-to-scanner-to-refund test. Only then consider sales launch. Continue the TAKATAK identity bridge contract, background webhook reconciliation and operational weather/rebooking tasks without duplicating earlier code.
