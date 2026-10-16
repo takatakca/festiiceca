@@ -140,7 +140,7 @@ type StripeSession = {
 export async function settleCheckout(
   kind: "paid" | "cancel", session: StripeSession, eventId: string,
 ): Promise<void> {
-  if (!fulfillmentConfigured()) throw new Error("Fulfillment unavailable");
+  if (!paymentProcessingConfigured()) throw new Error("Payment processing unavailable");
   const orderId = session.metadata?.order_id;
   if (!orderId || orderId !== session.client_reference_id) throw new Error("Order mismatch");
   const db = database();

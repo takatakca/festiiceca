@@ -67,3 +67,12 @@ test("no Stripe webhook signature or unapproved database rejects all payment eve
   assert.equal(paymentProcessingConfigured({ ...base, STRIPE_WEBHOOK_SECRET: undefined }), false);
   assert.equal(paymentProcessingConfigured({ ...base, SUPABASE_URL: "https://wrong.supabase.co" }), false);
 });
+
+test("payment settlement authorization is independent of email availability", () => {
+  const env = {
+    ...base, RESEND_API_KEY: undefined, FESTIICE_CHECKOUT_ENABLED: "false",
+  };
+  assert.equal(paymentProcessingConfigured(env), true);
+  assert.equal(fulfillmentConfigured(env), false);
+  assert.equal(paymentConfigured(env), false);
+});
