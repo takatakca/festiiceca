@@ -58,8 +58,12 @@ INSERT INTO public.orders(
   '00000000-0000-0000-0000-000000000031',
   'pending@example.ca',
   '00000000-0000-0000-0000-000000000003',
-  'PENDING_PAYMENT',5000
+  'PAID',5000
 );
+-- Deliberately simulate a still-pending order without invoking the BEFORE
+-- INSERT sales-start guard; gate authorization must inspect its current state.
+UPDATE public.orders SET status='PENDING_PAYMENT'
+ WHERE id='00000000-0000-0000-0000-000000000031';
 INSERT INTO public.tickets(
   order_id,time_slot_id,status,qr_token,ticket_type_code
 ) VALUES (

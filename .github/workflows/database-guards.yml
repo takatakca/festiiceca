@@ -64,3 +64,9 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016170000_operational_slot_controls.sql
       - name: Verify role, audit and reopening restrictions
         run: psql -v ON_ERROR_STOP=1 -f tests/sql/operations-assertions.sql
+      - name: Prepare scanner and refund fixtures
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/gate-fixtures.sql
+      - name: Apply secure ticket redemption replacement
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016183000_secure_ticket_redemption.sql
+      - name: Assert role, paid order, single scan and time-of-entry
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/gate-assertions.sql

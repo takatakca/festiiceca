@@ -73,6 +73,9 @@ jobs:
           status=$(curl --silent -o /dev/null -w '%{http_code}' -X POST \
             -H 'content-type: application/json' --data '{}' http://127.0.0.1:8080/api/stripe/webhook)
           [ "$status" = "503" ]
+          status=$(curl --silent -o /dev/null -w '%{http_code}' -X POST \
+            -H 'content-type: application/json' --data '{}' http://127.0.0.1:8080/api/gate/redeem)
+          [ "$status" = "503" ]
 
       - name: Verify Vercel SSR build output
         shell: bash
