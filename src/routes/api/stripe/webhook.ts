@@ -9,8 +9,8 @@ export const Route = createFileRoute("/api/stripe/webhook")({
         const secret = process.env["STRIPE_WEBHOOK_SECRET"];
         // Turning off new purchases must NEVER discard payment notifications
         // for sessions that customers have already completed.
-        const { fulfillmentConfigured } = await import("@/lib/checkout.server");
-        if (!secret || !fulfillmentConfigured())
+        const { paymentProcessingConfigured } = await import("@/lib/checkout.server");
+        if (!secret || !paymentProcessingConfigured())
           return new Response("Not configured", { status: 503 });
         if (Number(request.headers.get("content-length") ?? "0") > 65536)
           return new Response("Too large", { status: 413 });
