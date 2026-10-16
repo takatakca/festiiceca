@@ -86,3 +86,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016193000_financial_event_review_ledger.sql
       - name: Validate duplicate Stripe events and private manual reviews
         run: psql -v ON_ERROR_STOP=1 -f tests/sql/financial-review-assertions.sql
+
+      - name: Apply human financial review resolution
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016210000_financial_review_resolution.sql
+      - name: Verify administrative resolution and least privileges
+        run: psql -v ON_ERROR_STOP=1 -f tests/sql/financial-review-resolution-assertions.sql
