@@ -30,7 +30,7 @@ jobs:
       - name: Lint (semantic rules)
         run: "npx eslint . --rule 'prettier/prettier: off'"
       - name: Payment readiness regression tests
-        run: node --experimental-strip-types --test tests/payment-readiness.test.ts
+        run: node --experimental-strip-types --test tests/*.test.ts
       - name: Build server
         run: npm run build:node
 

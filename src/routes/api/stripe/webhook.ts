@@ -1,22 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { verifyStripeSignature } from "@/lib/stripe-signature";
 
-function validStripeSignature(payload: string, header: string | null, secret: string): boolean {
-  if (!header || !secret) return false;
-  const fields = header.split(",").map(piece => piece.trim().split("="));
-  const timestamp = fields.find(([key]) => key === "t")?.[1];
-  const signatures = fields.filter(([key]) => key === "v1").map(([,value]) => value);
-  if (!timestamp || !/^[0-9]+$/.test(timestamp) || signatures.length === 0 ||
-    Math.abs(Date.now()/1000 - Number(timestamp)) > 300) return false;
-  const expected = Buffer.from(
-    createHmac("sha256", secret).update(timestamp + "." + payload).digest("hex"), "hex",
-  );
-  return signatures.some(signature => {
-    if (!signature || !/^[a-f0-9]{64}$/i.test(signature)) return false;
-    const provided = Buffer.from(signature, "hex");
-    return provided.length === expected.length && timingSafeEqual(provided, expected);
-  });
-}
 
 export const Route = createFileRoute("/api/stripe/webhook")({
   server: {
@@ -32,7 +16,7 @@ export const Route = createFileRoute("/api/stripe/webhook")({
           return new Response("Too large", { status: 413 });
         const raw = await request.text();
         if (raw.length > 65536 ||
-          !validStripeSignature(raw, request.headers.get("stripe-signature"), secret))
+          !verifyStripeSignature(raw, request.headers.get("stripe-signature"), secret))
           return new Response("Invalid signature", { status: 400 });
         try {
           const event = JSON.parse(raw) as {

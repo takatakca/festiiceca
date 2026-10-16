@@ -61,7 +61,7 @@ jobs:
       - name: Semantic lint
         run: "npx eslint . --rule 'prettier/prettier: off'"
       - name: Unit tests
-        run: node --experimental-strip-types --test tests/payment-readiness.test.ts
+        run: node --experimental-strip-types --test tests/*.test.ts
       - name: Build
         run: npm run build:node
       - name: Commit lockfile changes
