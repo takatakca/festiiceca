@@ -36,17 +36,27 @@ BEGIN
  PERFORM pg_advisory_xact_lock(hashtextextended(_slot_id::text, 0));
  SELECT * INTO v_slot FROM public.time_slots WHERE id=_slot_id FOR UPDATE;
  IF NOT FOUND THEN RAISE EXCEPTION 'slot_not_found'; END IF;
+ IF v_slot.status NOT IN ('OPEN','CLOSED')
+ THEN RAISE EXCEPTION 'unsupported_slot_transition'; END IF;
  v_status := _status::public.public_status;
  IF v_slot.status = v_status THEN
    RETURN jsonb_build_object('result','UNCHANGED','slot_id',_slot_id,'status',_status);
  END IF;
  IF v_status = 'OPEN' THEN
    SELECT d.published AS date_published, d.status AS date_status,
-    d.is_test AS is_test,
+    d.is_test AS is_test, season.is_active AS season_active,
+    season.is_demo AS season_demo, season.status AS season_status,
+    season.sales_start_at AS sales_start_at, season.sales_end_at AS sales_end_at,
     ((d.event_date + v_slot.start_time) AT TIME ZONE 'America/Toronto') AS starts_at
-   INTO v_event FROM public.event_dates d WHERE d.id=v_slot.event_date_id;
+   INTO v_event FROM public.event_dates d
+   JOIN public.seasons season ON season.id=d.season_id
+   WHERE d.id=v_slot.event_date_id;
    IF NOT FOUND OR NOT v_slot.published OR NOT v_event.date_published
       OR v_event.is_test OR v_event.date_status <> 'OPEN'
+      OR NOT v_event.season_active OR v_event.season_demo
+      OR v_event.season_status <> 'ACTIVE'
+      OR (v_event.sales_start_at IS NOT NULL AND v_event.sales_start_at > now())
+      OR (v_event.sales_end_at IS NOT NULL AND v_event.sales_end_at < now())
       OR v_event.starts_at <= now() + interval '5 minutes'
    THEN RAISE EXCEPTION 'cannot_reopen_unavailable_slot'; END IF;
  END IF;
