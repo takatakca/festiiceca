@@ -3,6 +3,7 @@
  * Sales are closed unless all opt-in runtime settings and approved DB match.
  */
 import { createClient } from "@supabase/supabase-js";
+import { isWithinAutomaticEmailRetryWindow, recoveryWindow } from "./ticket-email-recovery";
 import QRCode from "qrcode";
 import { paymentConfigured, fulfillmentConfigured, paymentProcessingConfigured } from "./payment-readiness";
 export { paymentConfigured, fulfillmentConfigured, paymentProcessingConfigured } from "./payment-readiness";
@@ -171,10 +172,14 @@ export async function deliverOrderTickets(orderId: string): Promise<void> {
   if (!fulfillmentConfigured()) throw new Error("Ticket email not configured");
   const db = database();
   const { data: order, error: orderError } = await db.from("orders")
-    .select("order_number,customer_email,status,tickets_emailed_at")
+    .select("order_number,customer_email,status,tickets_emailed_at,paid_at")
     .eq("id", orderId).maybeSingle();
   if (orderError || !order || order.status !== "PAID") throw new Error("Order not paid");
   if (order.tickets_emailed_at) return;
+  // Resend's idempotency expires after 24h: prevent automatic duplicate
+  // emails if its earlier success was not recorded in our database.
+  if (!isWithinAutomaticEmailRetryWindow(order.paid_at))
+    throw new Error("Ticket email requires manual review outside idempotency window");
   const { data: tickets, error: ticketError } = await db.from("tickets")
     .select("id,qr_token,name_snapshot,ticket_type_code")
     .eq("order_id", orderId).order("id");
@@ -294,4 +299,30 @@ export async function recordFinancialReview(
     console.error("[stripe-review] durable review failure", error.code);
     throw new Error("Financial review not persisted");
   }
+}
+
+/** Retry at most three paid, unemailed orders inside the safe Resend window. */
+export async function recoverPendingTicketEmails(): Promise<{
+  attempted: number; delivered: number; failures: number; overdue: number;
+}> {
+  if (!fulfillmentConfigured()) throw new Error("Delivery not configured");
+  const db = database();
+  const { earliest, latest } = recoveryWindow();
+  const { data, error } = await db.from("orders").select("id,paid_at")
+    .eq("status","PAID").is("tickets_emailed_at",null)
+    .gte("paid_at",earliest).lte("paid_at",latest)
+    .order("paid_at",{ ascending: true }).limit(3);
+  if (error || !Array.isArray(data)) throw new Error("Recovery lookup unavailable");
+  const { count, error: overdueError } = await db.from("orders")
+    .select("id",{ count:"exact", head:true })
+    .eq("status","PAID").is("tickets_emailed_at",null).lt("paid_at",earliest);
+  if (overdueError) throw new Error("Overdue lookup unavailable");
+  let delivered=0,failures=0;
+  for (const record of data) {
+    if (!record || typeof record.id!=="string" ||
+        !isWithinAutomaticEmailRetryWindow(record.paid_at)) continue;
+    try { await deliverOrderTickets(record.id); delivered++; }
+    catch { failures++; console.error("[ticket-recovery] delivery pending"); }
+  }
+  return { attempted:delivered+failures,delivered,failures,overdue:count??0 };
 }
