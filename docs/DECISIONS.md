@@ -56,3 +56,9 @@ Updated: 2026-10-16.
 31. La clé Resend Idempotency-Key est conservée 24h seulement selon la documentation officielle. Les nouvelles reprises automatiques sont bornées à moins de 23h depuis `paid_at`; hors délai ou date invalide, l'envoi échoue fermé et le dossier est laissé pour révision humaine. La fenêtre protège aussi les anciens retries Stripe contre les doubles courriels après expiration de la clé.
 32. L'endpoint privé n'est pas ouvert ni programmé sans vérification : `FESTIICE_DELIVERY_RECOVERY_ENABLED`, secret de >=32 caractères, auth Bearer à comparaison constante, backend/Resend valide, maximum 3 commandes par invocation. Aucun PII client ni QR token dans la réponse ou les logs de relance.
 33. READY sur Vercel au SHA du code ne remplace ni l'association d'un domaine `.ca`, ni la santé HTTPS publique, ni le paiement/QR E2E sur fournisseurs réels. Maintenir vente et écriture financière désactivées.
+
+## 2026-10-28 — Strict Stripe cancellation after uncertain creation
+
+34. A failed HTTP response while creating a Stripe Checkout Session is an **unknown** outcome, not proof no session exists. Once a request to Stripe was attempted, do not call `cancel_checkout_order` and release inventory until the exact provider session is proven expired.
+35. A successful expiration HTTP status alone is insufficient: require an object with the expected `cs_...` ID and `status=expired`. If the session ID was unavailable, retain the pending 45-minute hold for bounded automatic expiration and later reconciliation.
+36. These guards are implemented and tested with pure regression cases, CI success `40739976622`/`40739977433`; not a real Stripe API integration. Production domain, central TAKATAK identity and Supabase authority remain prerequisites to open sales.

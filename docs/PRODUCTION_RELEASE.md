@@ -128,3 +128,7 @@ Vercel `READY` last confirmed for older `9e74fa87` only, custom .ca domain unver
 ## 2026-10-28 — Politique de reprise des billets
 
 Code validé `dbfa31344dcd4dc312175f2d061b42a74467a0bd` : mail recovery privé `GET /api/cron/recover-tickets`. Ne pas ajouter de cron Vercel automatique avant le bon projet Supabase, le secret d'authentification, le sender Resend et les tests Stripe/QR. Le worker relance au plus 3 commandes payées par appel entre 2 min et 23h après `paid_at`, puis exige une revue manuelle pour éviter les doublons après l'expiration de 24h des idempotency keys Resend. La réponse ne révèle aucune donnée client. CI GitHub `40739247114`/`40739246902` réussies; Vercel production-target READY à `dpl_Hs4nMusEPqa6vvuS7UvDPdCNrQtp` pour le code, mais la mise en ligne publique officielle n'est pas prouvée.
+
+## Stripe ambiguous checkout creation safeguards — 2026-10-28
+
+Commit `8bd6e0b4cba5e7856e138cd6e6d457e70ce30806`: a lost Stripe create response does NOT lead to immediate capacity release. The code retains the 45-minute hold on unknown provider outcomes, and confirms the exact Stripe session ID plus status `expired` before cancellation. Verified GitHub app CI `40739976622`, database CI `40739977433`, matching Vercel READY `dpl_7KxRRbqgrjLHJ8ykm7CKgcpAhBMa`. Neither public custom domain nor real payment service was verified. Sales remain disabled.

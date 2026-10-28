@@ -1,3 +1,31 @@
+# 2026-10-28 — Latest continuity checkpoint (second development task)
+
+**Repo:** `takatakca/festiiceca`; **branch:** `main`; **agent:** GPT-6.
+**Last completed task:** safe Stripe Checkout hold compensation after failed/ambiguous provider response.
+**Currently in progress / next:** actual backend, domain and centralized identity integration; staging E2E Stripe/Resend/QR, then monitored delivery recovery schedule.
+
+**Session's pushed SHAs, in order:**
+1. `58939dbb8eaede912c8d2a4f860223382ba8db67` — first WORKLOG claim.
+2. `dbfa31344dcd4dc312175f2d061b42a74467a0bd` — bounded email recovery code.
+3. `3d969875e437fce58b80439d422b47a467ed3c02` — first documentation/Drive handoff.
+4. `147c498b1b8c53376dbb08ac072d745e68356264` — second WORKLOG claim.
+5. `8bd6e0b4cba5e7856e138cd6e6d457e70ce30806` — Stripe compensation state safety, verified tests.
+6. **This handoff commit** — read latest HEAD of main for its exact SHA, then verify corresponding Actions/Vercel. Never assume the prior feature SHA is the current branch head.
+
+**Files changed in second task:** `WORKLOG.md`, `src/lib/checkout.server.ts`, `src/lib/checkout-compensation.ts`, `tests/checkout-compensation.test.ts`, all five required docs, `docs/PRODUCTION_RELEASE.md`; first task also modified `src/lib/ticket-email-recovery.ts`, `src/routes/api/cron/recover-tickets.ts`, `tests/ticket-email-recovery.test.ts`, `.github/workflows/ci.yml`.
+
+**Checks executed:** latest code SHA `8bd6e0b4cba5e7856e138cd6e6d457e70ce30806`; GitHub Actions application `40739976622` SUCCESS and ephemeral PostgreSQL `40739977433` SUCCESS; Vercel project `prj_qGUb3ABR8oP4OwPGUce9LF9soMAp` deployment `dpl_7KxRRbqgrjLHJ8ykm7CKgcpAhBMa` READY at exact SHA. Earlier recovery code `dbfa3134` has successful CI `40739247114`/`40739246902` and Vercel READY `dpl_Hs4nMusEPqa6vvuS7UvDPdCNrQtp`. Confirm new docs commit separately.
+
+**Error/risks fixed:** previous Checkout cleanup freed inventory when network failure left Stripe session creation ambiguous. Corrected: release only if no Stripe call attempted or the specific session has status expired returned by Stripe. Unknown creates retain the 45-min DB hold to prevent overbooking; staff reconciliation still needed for genuinely uncertain payments.
+
+**Remaining blockers:** Supabase authoritative ref mismatch; no approved central TAKATAK tenant/product claims; .ca domain not attached; no public HTTPS verified; no Stripe/Resend/QR vendor E2E; Vercel READY is a deployment status not proof of public commerce. Provider metadata and secrets must not be exposed; no production DB migration has been applied. New sales `FESTIICE_CHECKOUT_ENABLED=false`, finance writes `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=false`, and delivery recovery `FESTIICE_DELIVERY_RECOVERY_ENABLED=false` until onboarding passes. No scheduler is running for email recovery.
+
+**Google Drive continuity note:** https://docs.google.com/document/d/1adqsb88_NGVUja-YCtEnE-f-rjxMabo2AeRp8zLvwsU/edit — created because no prior FESTI-ICE technical handoff could be found (other search results were Havana video registers). Read/update it after the latest GitHub commit.
+
+**Exact next action:** verify main HEAD, actions and Vercel same SHA, test public HTTPS only once the .ca canonical domain is approved; identify backed-up real Supabase instance, obtain approved TAKATAK central entitlement and Stripe/Resend staging vendor credentials, perform paid→email→QR→refund verification, then enable feature flags only with proof. Keep client projects independent and avoid force-push/history rewriting.
+
+---
+
 # ÉTAT DE RELÈVE PRIORITAIRE — 28 OCTOBRE 2026
 
 **Source de vérité:** `takatakca/festiiceca`, branche `main`; lire le HEAD GitHub après cette note. **Agent:** GPT-6. **Date:** 2026-10-28 (America/Toronto).

@@ -1,3 +1,15 @@
+## 2026-10-28 — Stripe: ambiguous session creation is not a safe release condition
+
+- GitHub pushed `147c498b1b8c53376dbb08ac072d745e68356264` (WORKLOG claim), `8bd6e0b4cba5e7856e138cd6e6d457e70ce30806` (compensation code/tests).
+- `src/lib/checkout.server.ts`: a potentially completed Stripe Checkout creation can lose its HTTP response. The server **keeps** the existing 45-min hold if creation was attempted but the session outcome is unknown; it does NOT release capacity speculatively. When a session ID is known, the server expires the exact Stripe session and verifies returned `status=expired` and matching `id` before calling service-only `cancel_checkout_order`.
+- `src/lib/checkout-compensation.ts` and `tests/checkout-compensation.test.ts`: deterministic regression tests for pre-attempt cancellation, uncertain response, verified expiration, wrong session and wrong status.
+- CI `40739976622` (application Node tests, lint, builds/SSR) and `40739977433` (isolated PostgreSQL) **SUCCESS** at `8bd6e0b4cba5e7856e138cd6e6d457e70ce30806`.
+- Vercel `dpl_7KxRRbqgrjLHJ8ykm7CKgcpAhBMa` production-target **READY** at the same SHA `8bd6e0b4cba5e7856e138cd6e6d457e70ce30806`. Not proof of a public `.ca` website or real payment test.
+- Earlier handoff `3d969875` and Drive handoff: https://docs.google.com/document/d/1adqsb88_NGVUja-YCtEnE-f-rjxMabo2AeRp8zLvwsU/edit . Note the final documentation SHA is later; the next agent should resolve it from the current `main`.
+- No live Supabase changes, no Stripe charges, no customer data, no new domain or deployment override, no recurring job enabled. Sales and financial admin writes remain OFF.
+
+**Operational rollback behavior:** Post-Stripe network uncertainty keeps inventory held for its database TTL (45 minutes) instead of releasing immediately. If Stripe returns a session ID even with an invalid Checkout redirect URL, cleanup attempts expiration; only a response with matching `cs_...` and `status=expired` allows the DB cancellation. This prevents inventory overselling while a potentially payable checkout exists. No live Stripe request was executed in this session.
+
 ## 2026-10-28 — Récupération privée de courriels de billets
 
 Endpoint `GET /api/cron/recover-tickets` : **non planifié et fermé par défaut**. Paramètres nécessaires après validation de production :

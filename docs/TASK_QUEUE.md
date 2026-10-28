@@ -1,3 +1,11 @@
+# Update 2026-10-28 — payment compensation safety
+
+- [x] `8bd6e0b4`: retain a pending hold after an ambiguous Stripe session create response. Release only before any Stripe attempt, or after provider-confirmed expiration with matching session ID. CI `40739976622` + `40739977433` succeeded; Vercel `dpl_7KxRRbqgrjLHJ8ykm7CKgcpAhBMa` READY at exact source SHA.
+- [ ] **P0:** verify approved Supabase account and run a signed Stripe test charge with email delivery and admission scan. Current source config ref still differs from the connected empty named project. Do not apply migrations without explicit confirmation.
+- [ ] **P0:** authoritative canonical .ca domain; attach only after approved ownership/DNS decision and verify HTTPS `/api/health` SHA.
+- [ ] **P0:** central TAKATAK entitlement & per-company authorization plus validated Resend sender before enabling any paid or admin write flags.
+- [ ] **P1:** set up authenticated email recovery scheduler only after authorized vendor setup; 23h retry policy requires manual review for overdue cases.
+
 # Prochaines tâches — état vérifié au 2026-10-28
 
 | Priorité | État | Action |
