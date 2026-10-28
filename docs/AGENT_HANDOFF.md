@@ -1,3 +1,45 @@
+# ÉTAT DE RELÈVE PRIORITAIRE — 28 OCTOBRE 2026
+
+**Source de vérité:** `takatakca/festiiceca`, branche `main`; lire le HEAD GitHub après cette note. **Agent:** GPT-6. **Date:** 2026-10-28 (America/Toronto).
+**Dernière tâche terminée:** récupération bornée des billets QR pour les commandes payées non marquées « courriel envoyé », sans renvoi automatique après l'expiration de l'idempotence Resend.
+**Tâche actuelle/prochaine:** valider le domaine officiel et le vrai backend, puis activer en environnement de test le planificateur authentifié; tester Stripe → Resend → QR, aucune ouverture de ventes avant validation.
+
+## Commits poussés (séquence de cette reprise)
+1. `58939dbb8eaede912c8d2a4f860223382ba8db67` — claim WORKLOG avant codage.
+2. `dbfa31344dcd4dc312175f2d061b42a74467a0bd` — nouvelles routes, politiques d'idempotence et tests, push `main`.
+3. **Commit final de documentation :** utiliser le SHA actuel de `main` (le document est inclus dans ce commit; l'agent doit vérifier le HEAD).
+
+## Fichiers modifiés
+`WORKLOG.md`;
+`src/lib/checkout.server.ts`;
+`src/lib/ticket-email-recovery.ts`;
+`src/routes/api/cron/recover-tickets.ts`;
+`tests/ticket-email-recovery.test.ts`;
+`.github/workflows/ci.yml`;
+`docs/PROJECT_STATUS.md`, `docs/TASK_QUEUE.md`, `docs/AGENT_HANDOFF.md`, `docs/DEPLOYMENT.md`, `docs/DECISIONS.md`, `docs/PRODUCTION_RELEASE.md`.
+
+## Vérifications exécutées et résultats
+- Github HEAD initial `0acf57c2`; vérifié 5 branches, aucune PR ni issue ouverte; lu `AGENTS.md`, ancien handoff, WORKLOG et Actions.
+- Commit `dbfa31344dcd4dc312175f2d061b42a74467a0bd`, CI applicative `40739247114` **SUCCESS**; SQL PostgreSQL `40739246902` **SUCCESS**; tests Node vérifient fenêtres <23h, token privé, futur/invalides, et smoke SSR vérifie l'API fermée par défaut.
+- Vercel déploiement cible production `dpl_Hs4nMusEPqa6vvuS7UvDPdCNrQtp` **READY** pour exactement `dbfa31344dcd4dc312175f2d061b42a74467a0bd` (vérifié par liste de déploiements); domaine Vercel seul `festiiceca.vercel.app`, aucun `.ca` autorisé; `live:false`. **Aucun test HTTP de l'URL publique finale** ni paiement réel confirmé.
+- Resend documentation vérifiée : ses clés Idempotency-Key ne protègent qu'une période de 24h (https://resend.com/docs/dashboard/emails/idempotency-keys); un buffer de 1h est appliqué. Sans validation externe au-delà de 23h, aucun renvoi automatique.
+- Google Drive : aucune ancienne relève dev FESTI-ICE identifiable; document créé/lu et mis à jour https://docs.google.com/document/d/1adqsb88_NGVUja-YCtEnE-f-rjxMabo2AeRp8zLvwsU/edit. Les registres vidéo sont conservés, inchangés.
+- Aucun accès ni mutation au Supabase de production; aucun secret lu ou publié; aucun ordonnanceur créé.
+
+## Limites de mise en production
+1. Déterminer la base source autorisée: `supabase/config.toml` indique `xsozkxcnjmyjjaorkxlx`, mais le projet connected FESTI ICE `anyiaszbjsyrxfgjbwdt` est un projet différent/anciennement vide. Sauvegarde et migrations explicites nécessaires.
+2. TAKATAK master auth + séparation des tenants et rôles de produit non vérifiées. Supabase local `user_roles` n'est pas preuve de permission centrale.
+3. Aucun domaine `.ca` attaché à Vercel; `festiice.ca` vs `festi-ice.ca` encore non résolu; SSL/HTTP public non vérifié.
+4. Les fournisseurs Stripe et Resend, les secrets runtime, le sender et les essais paiement → QR → contrôle des billets ne sont pas intégrés/acceptés en production.
+5. Récupération courriel `GET /api/cron/recover-tickets` **fail-closed** tant que `FESTIICE_DELIVERY_RECOVERY_ENABLED` n'est pas `true` + `FESTIICE_DELIVERY_RECOVERY_SECRET` secret serveur >=32 caractères + config de livraison validée. Pas de cron Vercel programmé : ne pas lancer à vide.
+6. Le pointage des achats et la résolution financière restent désactivés. `FESTIICE_CHECKOUT_ENABLED=false`, `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=false`.
+7. Retards de courriels de plus de 23h : **revue humaine** obligatoire et politique d'envoi à définir; ne jamais prétendre que tous les emails sont livrés.
+
+## Action exacte suivante
+Comparer le HEAD GitHub, les deux workflows déclenchés par le commit documentaire, le Vercel SHA READY et le vrai `/api/health` HTTPS après validation du domaine. Identifier le vrai Supabase avant migrations. En staging autorisé, configurer les fournisseurs, les entitlements TAKATAK, l'ordonnanceur et le secret de récupération; tester un paiement et email réels jusqu'au contrôle QR et à la révocation. Actualiser ce document + Google Drive à chaque livraison.
+
+---
+
 # FESTI-ICE — Current agent handoff
 
 **Updated:** 2026-10-16, America/Toronto.

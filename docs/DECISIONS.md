@@ -50,3 +50,9 @@ Updated: 2026-10-16.
 
 29. `PATCH /api/operations/financial-reviews` is a proper TanStack Start server handler alongside GET. The SSR HTTP smoke test must prove write endpoint returns 503 while the `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED` flag is unset. This caught and resolved a real route registration error (latest verified app CI `38961413268`).
 30. The financial decision SQL is service-role only, uses an authenticated actor's admin role re-check, records reason/time/actor and refuses overwriting a resolved record. PostgreSQL validation `38961413271` is GREEN; live finance writes remain OFF and require central TAKATAK product authorization and canonical Supabase project.
+
+## 2026-10-28 — Sécurité de la récupération des billets
+
+31. La clé Resend Idempotency-Key est conservée 24h seulement selon la documentation officielle. Les nouvelles reprises automatiques sont bornées à moins de 23h depuis `paid_at`; hors délai ou date invalide, l'envoi échoue fermé et le dossier est laissé pour révision humaine. La fenêtre protège aussi les anciens retries Stripe contre les doubles courriels après expiration de la clé.
+32. L'endpoint privé n'est pas ouvert ni programmé sans vérification : `FESTIICE_DELIVERY_RECOVERY_ENABLED`, secret de >=32 caractères, auth Bearer à comparaison constante, backend/Resend valide, maximum 3 commandes par invocation. Aucun PII client ni QR token dans la réponse ou les logs de relance.
+33. READY sur Vercel au SHA du code ne remplace ni l'association d'un domaine `.ca`, ni la santé HTTPS publique, ni le paiement/QR E2E sur fournisseurs réels. Maintenir vente et écriture financière désactivées.

@@ -1,3 +1,14 @@
+## 2026-10-28 — Récupération privée de courriels de billets
+
+Endpoint `GET /api/cron/recover-tickets` : **non planifié et fermé par défaut**. Paramètres nécessaires après validation de production :
+- `FESTIICE_DELIVERY_RECOVERY_ENABLED=true` pour autoriser l'appel;
+- `FESTIICE_DELIVERY_RECOVERY_SECRET` : clé privée aléatoire >=32 caractères, envoyée via `Authorization: Bearer …` depuis un scheduler privé approuvé;
+- variables Supabase/Stripe/Resend et sender validés déjà requis par `fulfillmentConfigured()`.
+
+L'endpoint retourne un résumé sans coordonnées client : `{attempted,delivered,failures,overdue}`. Trois commandes maximum par invocation, payées depuis >=2 minutes et <23 heures; clé Idempotency-Key existante réutilisée. Si `failures>0`, HTTP 503; sinon 200. Les dossiers `overdue` ont besoin d'une intervention humaine afin de ne pas dépasser les 24 heures de rétention d'idempotence fournisseur. Une configuration Vercel Cron est volontairement omise tant que le projet/domaine autorisé et les secrets n'ont pas été validés. **N'ajouter aucune valeur de secret à GitHub.**
+
+GitHub `dbfa3134`, Actions `40739247114` et `40739246902` **SUCCESS**. Vercel READY cible production au SHA exact : `dpl_Hs4nMusEPqa6vvuS7UvDPdCNrQtp`; projet encore `live:false` et domaine `.ca` non configuré. Docs Drive agents: https://docs.google.com/document/d/1adqsb88_NGVUja-YCtEnE-f-rjxMabo2AeRp8zLvwsU/edit. Test HTTPS sur domaine officiel manquant.
+
 # FESTI-ICE — Deployment and operations
 
 **Updated:** 2026-10-16. Repo `takatakca/festiiceca`, branch `main`.

@@ -1,3 +1,14 @@
+# Prochaines tâches — état vérifié au 2026-10-28
+
+| Priorité | État | Action |
+| --- | --- | --- |
+| P0 | **Code terminé, CI verte** | Ticket email recovery : `dbfa3134`, tests `40739247114`/`40739246902`. Endpoint privé `/api/cron/recover-tickets`, aucun planificateur ni secret activé. |
+| P0 | **Vercel READY, domaine non validé** | `dpl_Hs4nMusEPqa6vvuS7UvDPdCNrQtp` READY au SHA `dbfa3134`; vérifier HTTPS et `/api/health` sur le **domaine approuvé** une fois associé. |
+| P0 | **Bloqué** | Valider la base Supabase officielle, ses migrations et la sauvegarde; authentification/entitlements TAKATAK par produit/entreprise; Stripe test, Resend vérifié et QR bout en bout. |
+| P1 | **Bloqué par les fournisseurs** | Activer un ordonnanceur privé (ex. Vercel Cron) SEULEMENT après environnement approuvé, `FESTIICE_DELIVERY_RECOVERY_ENABLED=true` et secret serveur >=32 caractères; fenêtre automatique limitée à 23h. |
+| P1 | **À faire** | Revoir manuellement les billets payés non livrés au-delà de 23h (clé Resend expirée après 24h); concevoir confirmation de livraison sans doubles envois et alertes d'exploitation. |
+| P1 | **À faire** | Replanification météo, intégration des droits centrale TAKATAK, finalisation dates et conformité mobile/accessibilité. |
+
 # FESTI-ICE — Prioritized task queue
 
 Updated 2026-10-16. Tasks marked complete mean code/CI verification only when so specified; do not equate with paid integration acceptance.

@@ -1,3 +1,12 @@
+## 2026-10-28 — Reprise vérifiée (GPT-6)
+
+- **GitHub:** `takatakca/festiiceca`, `main`. SHA de départ `0acf57c24cf0a298be52ce5c0c1960a79bd3a37a`; aucun PR/issue ouvert; branches préservées `claude/revoke-anon-ticketing-rpc`, `copilot/fix-code-and-errors`, `docs/git-workflow-owner-main`, `seo-legal-kit`.
+- **Commits effectivement poussés:** `58939dbb8eaede912c8d2a4f860223382ba8db67` (claim WORKLOG); `dbfa31344dcd4dc312175f2d061b42a74467a0bd` (récupération bornée de courriels); commit documentaire actuel à lire via le SHA HEAD de `main`. Jamais de force-push.
+- **Tests du code `dbfa3134` :** GitHub Actions `40739247114` (app, tests Node, lint, SSR/Vercel) **SUCCESS**; `40739246902` (PostgreSQL) **SUCCESS**.
+- **Vercel:** `dpl_Hs4nMusEPqa6vvuS7UvDPdCNrQtp` = **READY** sur cible `production` pour le même SHA `dbfa31344dcd4dc312175f2d061b42a74467a0bd`; c'est une confirmation du build/déploiement cible, PAS de disponibilité publique. Le projet Vercel indique `live:false`; seul `festiiceca.vercel.app` est configuré/vérifié, pas de domaine officiel `.ca`. Contrôle HTTPS public du site final non confirmé.
+- **Google Drive:** aucune ancienne note *technique* FESTI-ICE trouvée parmi les fichiers accessibles; les résultats FESTI ICE correspondaient principalement à des registres vidéo Havana. Nouvelle relève créée et relue : https://docs.google.com/document/d/1adqsb88_NGVUja-YCtEnE-f-rjxMabo2AeRp8zLvwsU/edit. Ne pas écraser les registres vidéo.
+- **Blocages inchangés:** Supabase source `xsozkxcnjmyjjaorkxlx` différent du projet connecté vide `anyiaszbjsyrxfgjbwdt`; droits centraux TAKATAK non validés, domaine propriétaire non attaché, clés Stripe/Resend réelles et QR E2E non vérifiés. Ne pas appliquer les migrations à la mauvaise base, et ne pas ouvrir de ventes.
+
 # FESTI-ICE — Project status
 
 **Checked:** 2026-10-16 America/Toronto

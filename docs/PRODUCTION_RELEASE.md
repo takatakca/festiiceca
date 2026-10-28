@@ -124,3 +124,7 @@ commit and an independent HTTPS domain check.
 Run `20261016210000_financial_review_resolution.sql` only after identifying and backing up the approved Supabase project and applying the foundational finance-review ledger. PostgreSQL disposable fixtures validate the SQL; these do not constitute a real Stripe test. To enable administrative writes, confirm central TAKATAK product/tenant entitlements, then set `FESTIICE_FINANCE_REVIEW_WRITES_ENABLED=true` in protected server environment and validate a real authorized review without money movement. Default flag absent/false keeps PATCH at HTTP 503.
 
 Vercel `READY` last confirmed for older `9e74fa87` only, custom .ca domain unverified. Verify deployed SHA/HTTPS before any announcement.
+
+## 2026-10-28 — Politique de reprise des billets
+
+Code validé `dbfa31344dcd4dc312175f2d061b42a74467a0bd` : mail recovery privé `GET /api/cron/recover-tickets`. Ne pas ajouter de cron Vercel automatique avant le bon projet Supabase, le secret d'authentification, le sender Resend et les tests Stripe/QR. Le worker relance au plus 3 commandes payées par appel entre 2 min et 23h après `paid_at`, puis exige une revue manuelle pour éviter les doublons après l'expiration de 24h des idempotency keys Resend. La réponse ne révèle aucune donnée client. CI GitHub `40739247114`/`40739246902` réussies; Vercel production-target READY à `dpl_Hs4nMusEPqa6vvuS7UvDPdCNrQtp` pour le code, mais la mise en ligne publique officielle n'est pas prouvée.

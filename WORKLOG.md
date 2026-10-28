@@ -3,7 +3,7 @@
 Newest first, one line per piece of work. Rule: `AGENTS.md` › Work log rule.
 Format: `YYYY-MM-DD | agent | branch → PR | status | what | next step`
 
-- 2026-10-28 | GPT-6 (delivery recovery) | main → direct | active | Recover paid ticket emails safely within Resend 24h idempotency, authenticate server retry and verify CI; synchronize GitHub/Drive handoffs | test, push, verify release and update notes
+- 2026-10-28 | GPT-6 (delivery recovery) | main → direct | done: code/CI/Vercel-target READY; launch blocked | Added private /api/cron/recover-tickets and 23h provider idempotency cutoff, max 3 retries, fail-closed authentication, overdue counts, JS + SSR tests; code SHA dbfa3134, app CI 40739247114 and DB CI 40739246902 green; Drive note created | verify final doc HEAD/CI, official public domain HTTPS, approved Supabase/TAKATAK, Stripe/Resend E2E before turning recovery/checkout on
 - 2026-10-16 | GPT-6 (finance review completion) | main → direct | done: code/CI; deployment blocked | Added audited ADMIN/SUPER_ADMIN resolution of signed Stripe exception reviews, safe default-disabled PATCH, actual form, corrected handler nesting/TypeScript and verified both CI runs at 2499eba5 (app 38961413268; DB 38961413271) | Vercel team 403/old READY only; approve canonical Supabase/TAKATAK identity and domain before enabling any sale or admin write
 - 2026-10-16 | GPT-6 (Stripe lifecycle) | main → direct | done: code/CI, blocked: production authorization | Fixed paid-event settlement independent of Resend and safe Stripe-expired orphan session compensation; commit 9b3182d8 and both CI jobs pass | recover Vercel 403/team rights, verify latest SHA/public domain, identify real Supabase and complete Stripe/Resend E2E
 
