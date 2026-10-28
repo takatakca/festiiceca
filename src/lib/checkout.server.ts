@@ -5,6 +5,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { isWithinAutomaticEmailRetryWindow, recoveryWindow } from "./ticket-email-recovery";
 import QRCode from "qrcode";
+import { canReleaseCheckoutHold, isVerifiedStripeExpiration } from "./checkout-compensation";
 import { paymentConfigured, fulfillmentConfigured, paymentProcessingConfigured } from "./payment-readiness";
 export { paymentConfigured, fulfillmentConfigured, paymentProcessingConfigured } from "./payment-readiness";
 
@@ -83,6 +84,7 @@ export async function startCheckout(cart: Cart): Promise<string> {
   if (error) throw new Error("Sélection indisponible");
   const order = validOrder(data);
   let sessionId: string | null = null;
+  let stripeCreateAttempted = false;
   try {
     const base = process.env["FESTIICE_CANONICAL_ORIGIN"]!;
     const form = new URLSearchParams();
@@ -109,12 +111,16 @@ export async function startCheckout(cart: Cart): Promise<string> {
     add("Option Flex Météo", order.flex_cents);
     add("TPS (5 %)", order.gst_cents);
     add("TVQ (9,975 %)", order.qst_cents);
+    stripeCreateAttempted = true;
     const raw = await postStripe("checkout/sessions", form, "festiice-" + order.order_id);
     const session = raw as { id?: unknown; url?: unknown };
-    if (typeof session.id !== "string" || typeof session.url !== "string" ||
+    // Preserve the provider session ID even if Stripe's URL is absent:
+    // the cleanup must expire a session that might still be payable.
+    if (typeof session.id === "string" && session.id.startsWith("cs_"))
+      sessionId = session.id;
+    if (!sessionId || typeof session.url !== "string" ||
       !session.url.startsWith("https://checkout.stripe.com/"))
       throw new Error("Invalid Stripe Checkout session");
-    sessionId = session.id;
     const result = await db.from("orders")
       .update({ stripe_checkout_session_id: sessionId })
       .eq("id", order.order_id).eq("status","PENDING_PAYMENT")
@@ -123,12 +129,24 @@ export async function startCheckout(cart: Cart): Promise<string> {
     return session.url;
   } catch (reason) {
     console.error("[checkout] session error", reason instanceof Error ? reason.message : "unknown");
+    let expired = false;
     if (sessionId) {
-      // Never free capacity while a live Stripe session might still charge.
-      try { await postStripe("checkout/sessions/" + encodeURIComponent(sessionId) + "/expire", new URLSearchParams()); }
-      catch { throw new Error("Paiement indisponible; contactez le soutien."); }
+      // Only a provider-confirmed expiration permits releasing a hold.
+      try {
+        const result = await postStripe(
+          "checkout/sessions/" + encodeURIComponent(sessionId) + "/expire",
+          new URLSearchParams(),
+        );
+        expired = isVerifiedStripeExpiration(result, sessionId);
+      } catch { /* Keep the 45-minute hold: the session may still be payable. */ }
     }
-    await db.rpc("cancel_checkout_order", { _order_id: order.order_id, _stripe_session: sessionId });
+    if (!canReleaseCheckoutHold(stripeCreateAttempted, expired))
+      throw new Error("Paiement incertain; la réservation expirera automatiquement.");
+    const cancellation = await db.rpc("cancel_checkout_order", {
+      _order_id: order.order_id, _stripe_session: sessionId,
+    });
+    if (cancellation.error)
+      console.error("[checkout] cancel pending", cancellation.error.code);
     throw new Error("Impossible de préparer le paiement.");
   }
 }
